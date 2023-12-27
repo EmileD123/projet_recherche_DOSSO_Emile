@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
-
+from merge_sort import merge_sort as merge_sort 
 
 #on s'attaque à la matrice de covariance
 with open('Pantheon+SH0ES_STAT+SYS.txt') as file:
@@ -55,7 +55,7 @@ def likelihood_func(OmegaMatter,OmegaLambda,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(73.5*((OmegaMatter[j][j]*((1+x)**3)+OmegaLambda[k][k])**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (H0=73.5 pour le flat wCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
+                    return (1/(73.6*((OmegaMatter[j][j]*((1+x)**3)+OmegaLambda[k][k])**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (H0=73.6 pour le flat LCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
                 result = spi.quad(f,0,zHD[i])                                               #idem
                 mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 
@@ -89,9 +89,9 @@ def likelihood_func(OmegaMatter,OmegaLambda,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 #maintenant on va tenter de tracer le diagramme (Omegam,Omegalambda) en faisant varier ces paramètres et trouver le minimum de la likelihood
 delta = 0.001
-OmegaM = np.arange(0.25, 0.351, delta) 
-OmegaL = np.arange(0.65, 0.751, delta)                #OmegaM.copy().T 
-OmegaM, OmegaL = np.meshgrid(OmegaM, OmegaL)
+OmegaM = np.arange(0.23, 0.351, delta) 
+OmegaL = np.arange(0.63, 0.751, delta)                #OmegaM.copy().T 
+OmegaM, OmegaL = np.meshgrid(OmegaM, OmegaL,indexing='ij')
 OmegaM = OmegaM.astype(float);  OmegaL = OmegaL.astype(float)
 Z = likelihood_func(OmegaM,OmegaL,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Z = np.array(Z) ; Z = Z.astype(float)
@@ -103,45 +103,51 @@ print(Z) ; print(OmegaM, OmegaL)
 
 min = Z[0][1]; indexOm = 0 ; indexOl = 0
 CL_68 = []
+CL_68_Omega_M = []
+CL_68_Omega_L = []
 CL_95 = []
+
 for i in range(len(Z)) :
     for j in range(len(Z[i])) :
         if min >= Z[i][j] and Z[i][j] != 0 and Z[i][j] != nan:
-            min = Z[i][j] ; arg_min_Om = OmegaM[0][i] ; arg_min_Ol = OmegaL[j][0]
+            min = Z[i][j] ; arg_min_Om = OmegaM[i][j] ; arg_min_Ol = OmegaL[i][j]
 print("Om= ",arg_min_Om,"; Ol= ", arg_min_Ol, "; min =", min)
              #/(len(OmegaM)-1)                 #/(len(OmegaL)-1)
+
 
 
 for i in range(len(Z)) :
     for j in range(len(Z[i])) :
         if min <= Z[i][j] and Z[i][j]<=min+6.17 and Z[i][j] != nan:
+            Cl_95.append(OmegaM[i][j]);Cl_95.append(OmegaL[i][j])
             CL_95.append([Z[i][j]])
-            CL_95.append(i)
-            CL_95.append(j)
+
         if min <= Z[i][j] and Z[i][j]<=min+2.3 and Z[i][j] != nan:
+            CL_68_Omega_M.append(OmegaM[i][j]);CL_68_Omega_L.append(OmegaL[i][j])
+            Cl_68.append(OmegaM[i][j]);Cl_68.append(OmegaL[i][j])
             CL_68.append([Z[i][j]])
-            CL_68.append(i)
-            CL_68.append(j)
+   
+merge_sort(CL_68_Omega_L);merge_sort(CL_68_Omega_M)
 
 print("Cl_95 =", CL_95)
 print("nb d'éléments CL_95 =",len(CL_95)/3)
 print("CL_68 =", CL_68)
 print("nb d'éléments CL_68 =",len(CL_68)/3)
-
-
+print("CL_68_Omega_M=", CL_68_Omega_M)
+print("CL_68_Omega_L=", CL_68_Omega_L)
 
 
 
 fig, ax = plt.subplots()
 im = ax.imshow(Z, interpolation ='bilinear',
                origin ='lower',
-               cmap ="bone",extent=(0.65,0.75,0.25,0.35)) 
+               cmap ="bone",extent=(OmegaM[0],OmegaM[len(OmegaM)-1],OmegaL[0],OmegaL[len(OmegaL)-1])) 
   
 levels = [min+2.3,min+6.7]
 CS = ax.contour(Z, levels, 
                 origin ='lower',
                 cmap ='Greens',
-                linewidths = 2,extent=(0.65,0.75,0.25,0.35))
+                linewidths = 2,extent=(OmegaM[0],OmegaM[len(OmegaM)-1],OmegaL[0],OmegaL[len(OmegaL)-1]))
 
 ax.set_xlabel('OmegaLambda', fontsize=12)  
 ax.set_ylabel('OmegaM', fontsize=12)
