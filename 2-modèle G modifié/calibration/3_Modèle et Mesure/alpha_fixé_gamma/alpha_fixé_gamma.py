@@ -69,8 +69,8 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
         likelihood.append(np.dot(A,DeltaD)) 
     return likelihood
 
-delta = 1
-gamma = np.arange(-100,100, delta) #gamma = np.arange(-0.1, 0.601, delta) 
+delta = 0.1
+gamma = np.arange(4.5,5.5, delta) #gamma = np.arange(-0.1, 0.601, delta) 
 gamma = gamma.astype(float)
 Z = likelihood_func(gamma,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Z = np.array(Z) ; Z = Z.astype(float)
@@ -106,3 +106,25 @@ print("Cl_95 =", CL_95)
 print("nb d'éléments CL_95 =",len(CL_95)/3)
 print("CL_68 =", CL_68)
 print("nb d'éléments CL_68 =",len(CL_68)/3)
+"""
+fig, ax = plt.subplots()
+im = ax.imshow(Z, interpolation ='bilinear',
+               origin ='lower',
+               cmap ="bone",extent=(gamma[0],gamma[len(gamma)-1],gamma[0],gamma[len(gamma)-1])) #marche pas -> à changer !
+  
+levels = [min+2.3,min+6.7]
+CS = ax.contour(Z, levels, 
+                origin ='lower',
+                cmap ='Greens',
+                linewidths = 2,extent=(gamma[0],gamma[len(gamma)-1],gamma[0],gamma[len(gamma)-1]))
+
+ax.set_xlabel('OmegaM', fontsize=12)  
+ax.set_ylabel('OmegaLambda', fontsize=12)
+
+ax.clabel(CS, levels,
+          inline = 1, 
+          fmt ='% 1.1f',
+          fontsize = 9)
+
+plt.show()
+"""

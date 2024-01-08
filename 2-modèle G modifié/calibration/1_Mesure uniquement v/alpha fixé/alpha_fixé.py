@@ -75,8 +75,8 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 
-delta = 0.001
-gamma = np.arange(-0.1, 0.601, delta) 
+delta = 0.1
+gamma = np.arange(-1, 1.1, delta) 
 gamma = gamma.astype(float)
 Z = likelihood_func(gamma,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Z = np.array(Z) ; Z = Z.astype(float)
@@ -87,7 +87,7 @@ print(Z) ; print(gamma)
 
 
 
-min = Z[20]
+min = Z[0]
 CL_68 = []
 CL_95 = []
 for i in range(len(Z)) :

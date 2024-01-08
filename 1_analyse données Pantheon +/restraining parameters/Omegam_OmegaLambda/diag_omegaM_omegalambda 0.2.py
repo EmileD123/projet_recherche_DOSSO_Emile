@@ -89,9 +89,9 @@ def likelihood_func(OmegaMatter,OmegaLambda,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 #maintenant on va tenter de tracer le diagramme (Omegam,Omegalambda) en faisant varier ces paramètres et trouver le minimum de la likelihood
 delta = 0.001
-OmegaM = np.arange(0.23, 0.351, delta) 
-OmegaL = np.arange(0.63, 0.751, delta)                #OmegaM.copy().T 
-OmegaM, OmegaL = np.meshgrid(OmegaM, OmegaL,indexing='ij')
+OmegaM = np.arange(0.25, 0.451, delta) 
+OmegaL = np.arange(0.55, 0.751, delta)              #OmegaM.copy().T 
+OmegaL, OmegaM = np.meshgrid(OmegaL, OmegaM,indexing='ij')
 OmegaM = OmegaM.astype(float);  OmegaL = OmegaL.astype(float)
 Z = likelihood_func(OmegaM,OmegaL,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Z = np.array(Z) ; Z = Z.astype(float)
@@ -119,12 +119,13 @@ print("Om= ",arg_min_Om,"; Ol= ", arg_min_Ol, "; min =", min)
 for i in range(len(Z)) :
     for j in range(len(Z[i])) :
         if min <= Z[i][j] and Z[i][j]<=min+6.17 and Z[i][j] != nan:
-            Cl_95.append(OmegaM[i][j]);Cl_95.append(OmegaL[i][j])
+            CL_95.append(OmegaM[i][j])
+            CL_95.append(OmegaL[i][j])
             CL_95.append([Z[i][j]])
 
         if min <= Z[i][j] and Z[i][j]<=min+2.3 and Z[i][j] != nan:
             CL_68_Omega_M.append(OmegaM[i][j]);CL_68_Omega_L.append(OmegaL[i][j])
-            Cl_68.append(OmegaM[i][j]);Cl_68.append(OmegaL[i][j])
+            CL_68.append(OmegaM[i][j]);CL_68.append(OmegaL[i][j])
             CL_68.append([Z[i][j]])
    
 merge_sort(CL_68_Omega_L);merge_sort(CL_68_Omega_M)
@@ -141,16 +142,16 @@ print("CL_68_Omega_L=", CL_68_Omega_L)
 fig, ax = plt.subplots()
 im = ax.imshow(Z, interpolation ='bilinear',
                origin ='lower',
-               cmap ="bone",extent=(OmegaM[0],OmegaM[len(OmegaM)-1],OmegaL[0],OmegaL[len(OmegaL)-1])) 
+               cmap ="bone",extent=(OmegaM[0][0],OmegaM[len(OmegaM)-1][len(OmegaM)-1],OmegaL[0][0],OmegaL[len(OmegaL)-1][len(OmegaL)-1])) #marche pas -> à changer !
   
 levels = [min+2.3,min+6.7]
 CS = ax.contour(Z, levels, 
                 origin ='lower',
                 cmap ='Greens',
-                linewidths = 2,extent=(OmegaM[0],OmegaM[len(OmegaM)-1],OmegaL[0],OmegaL[len(OmegaL)-1]))
+                linewidths = 2,extent=(OmegaM[0][0],OmegaM[len(OmegaM)-1][len(OmegaM)-1],OmegaL[0][0],OmegaL[len(OmegaL)-1][len(OmegaL)-1]))
 
-ax.set_xlabel('OmegaLambda', fontsize=12)  
-ax.set_ylabel('OmegaM', fontsize=12)
+ax.set_xlabel('OmegaM', fontsize=12)  
+ax.set_ylabel('OmegaLambda', fontsize=12)
 
 ax.clabel(CS, levels,
           inline = 1, 
