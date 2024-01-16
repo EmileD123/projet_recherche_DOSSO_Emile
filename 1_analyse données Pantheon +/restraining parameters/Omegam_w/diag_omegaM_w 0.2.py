@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
-
+from merge_sort import merge_sort as merge_sort
 
 #on s'attaque à la matrice de covariance
 with open('Pantheon+SH0ES_STAT+SYS.txt') as file:
@@ -91,24 +91,21 @@ def likelihood_func(OmegaMatter,W_eq_of_state,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 delta = 0.001
 OmegaM = np.arange(0.25, 0.351, delta) 
 w = np.arange(-0.95, -0.849, delta)                #OmegaM.copy().T 
-OmegaM, w = np.meshgrid(OmegaM,w)
+OmegaM, w = np.meshgrid(OmegaM,w,indexing='ij')
 OmegaM = OmegaM.astype(np.float64);  w = w.astype(np.float64)
 Z = likelihood_func(OmegaM,w,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprime un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z)
-print(OmegaM)
-print(w)
 
 
 min = Z[0][1]
 CL_68 = []
+CL_68_Omega_M = []
+CL_68_w = []
 CL_95 = []
 for i in range(len(Z)) :
     for j in range(len(Z[i])) :
         if min >= Z[i][j] and Z[i][j] != 0 and Z[i][j] != nan:
-            min = Z[i][j] ; arg_Om_min = OmegaM[0][i] ; arg_w_min = w[j][0]
+            min = Z[i][j] ; arg_Om_min = OmegaM[i][j] ; arg_w_min = w[i][j]
 print("Om= ",arg_Om_min,"; w= ", arg_w_min, "; min =", min)
              
 
@@ -116,17 +113,23 @@ for i in range(len(Z)) :
     for j in range(len(Z[i])) :
         if min <= Z[i][j] and Z[i][j]<=min+6.17 and Z[i][j] != nan:
             CL_95.append([Z[i][j]])
-            CL_95.append(i)
-            CL_95.append(j)
+            CL_95.append(OmegaM[i][j])
+            CL_95.append(w[i][j])
         if min <= Z[i][j] and Z[i][j]<=min+2.3 and Z[i][j] != nan:
             CL_68.append([Z[i][j]])
-            CL_68.append(i)
-            CL_68.append(j)
+            CL_68.append(OmegaM[i][j])
+            CL_68.append(w[i][j])
+            CL_68_Omega_M.append(OmegaM[i][j]);CL_68_w.append(w[i][j])
+
+        
+merge_sort(CL_68_Omega_M);merge_sort(CL_68_w)
 
 print("Cl_95 =", CL_95)
 print("nb d'éléments CL_95 =",len(CL_95)/3)
 print("CL_68 =", CL_68)
 print("nb d'éléments CL_68 =",len(CL_68)/3)
+print("CL_68_Omega_M=", CL_68_Omega_M)
+print("CL_68_w", CL_68_w)
 
 
 
@@ -135,16 +138,16 @@ print("nb d'éléments CL_68 =",len(CL_68)/3)
 fig, ax = plt.subplots()
 im = ax.imshow(Z, interpolation ='bilinear',
                origin ='lower',
-               cmap ="bone",extent=(-0.95,-0.85,0.25,0.35))
+               cmap ="bone",extent=(OmegaM[0][0],OmegaM[len(OmegaM)-1][len(OmegaM)-1],w[0][0],w[len(w)-1][len(w)-1]))
   
-levels = [min+2.3,min+6.7]
+levels = [min+2.3,min+6.17]
 CS = ax.contour(Z, levels, 
                 origin ='lower',
                 cmap ='Greens',
-                linewidths = 2,extent=(-0.95,-0.85,0.25,0.35))
+                linewidths = 2,extent=(OmegaM[0][0],OmegaM[len(OmegaM)-1][len(OmegaM)-1],w[0][0],w[len(w)-1][len(w)-1]))
 
-ax.set_xlabel('w', fontsize=12)  
-ax.set_ylabel('OmegaM', fontsize=12)   
+ax.set_xlabel('OmegaM', fontsize=12)  
+ax.set_ylabel('w', fontsize=12)   
 ax.clabel(CS, levels,
           inline = 1, 
           fmt ='% 1.1f',

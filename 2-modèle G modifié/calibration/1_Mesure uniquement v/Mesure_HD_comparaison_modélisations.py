@@ -27,13 +27,14 @@ CEPH_DIST = np.array(CEPH_DIST); zHD = np.array(zHD); MU_SHOES = np.array(MU_SHO
 CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOES.astype(float)
 
 
-
+plt.figure(1)
 #C'est bon on a nos deux listes : il ne reste plus qu'à tracer le nuages de points
-plt.scatter(zHD,MU_SHOES , c='black', marker='.', label='Original Data')
+plt.scatter(zHD,MU_SHOES , c='blue', marker='.', label='Original Data')
+"""
 y = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES)
 #print(y)
 plt.plot(zHD,39.29971437+2.31618666*np.log(zHD*6.60324733), c = 'black',label='Fitted Curve Original Data')
-
+"""
 
 plt.ylabel('modulus distance')
 plt.xlabel('redshift')
@@ -44,7 +45,16 @@ plt.title('Hubble diagram of SNe IA')
 MU_SHOES_only_alpha = [] ; MU_SHOES_only_alpha_form_exp = [] ; MU_SHOES_alpha_fixé_et_gamma_à_optimiser = [] 
 MU_SHOES_alpha_fixé_et_gamma_à_optim_forme_exp = [] ; MU_SHOES_alpha_fixé_et_beta_à_optimiser = [] ; MU_SHOES_alpha_fixe_et_beta_gamma_à_optim = [] 
 
+MU_theory_flatLCDM = []
+for z in zHD:
+    def f(x):
+        return (1/(73.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6)
+    result = spi.quad(f,0,z)
+    result_final = 5*np.log10(((1+z)*result[0])/10)
+    #residuals = ? <- difficulté : associer à chaque entité de MU_SHOES un redshift : pas si simple parce qu'il y a plus de light curves (1701) que de SNE1A (1500 et des bananes) donc à priori certaines instances de MU_SHOES ont des z identiques ...   
+    MU_theory_flatLCDM.append(result_final)
 
+plt.plot(zHD,MU_theory_flatLCDM,c='red',label='Theory flat LCDM')
 
 for i in range(1701):
         """
@@ -85,11 +95,12 @@ y_only_alpha_exp = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zH
 plt.plot(zHD,y_only_alpha_exp[0][0]+y_only_alpha_exp[0][1]*np.log(zHD*y_only_alpha_exp[0][2]), c ='r' ,label='Fitted Curve only alpha exp')
 """
 #alpha_fixé_et_gamma_à_optimiser : 36.41466768 2.31238919 22.91085229
-plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optimiser , c='pink', marker='.', label='alpha_fixé_et_gamma_à_optimiser ')
+plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optimiser , c='green', marker='.', label='alpha_fixé_et_gamma_à_optimiser ')
+"""
 y_alpha_fixé_et_gamma_à_optimiser = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES_alpha_fixé_et_gamma_à_optimiser)
 #print(y_alpha_fixé_et_gamma_à_optimiser)
-plt.plot(zHD,y_alpha_fixé_et_gamma_à_optimiser[0][0]+y_alpha_fixé_et_gamma_à_optimiser[0][1]*np.log(zHD*y_alpha_fixé_et_gamma_à_optimiser[0][2]), c ='pink' ,label='Fitted Curve alpha_fixé_et_gamma_à_optimiser')
-"""
+plt.plot(zHD,y_alpha_fixé_et_gamma_à_optimiser[0][0]+y_alpha_fixé_et_gamma_à_optimiser[0][1]*np.log(zHD*y_alpha_fixé_et_gamma_à_optimiser[0][2]), c ='red' ,label='Fitted Curve alpha_fixé_et_gamma_à_optimiser')
+
 #alpha_fixé_et_gamma_à_optim_forme_exp 35.16131108 2.31234324 39.39771072
 plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optim_forme_exp , c='blue', marker='.', label='alpha_fixé_et_gamma_à_optim_forme_exp')
 y_alpha_fixé_et_gamma_à_optim_forme_exp = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES_alpha_fixé_et_gamma_à_optim_forme_exp)
@@ -109,10 +120,26 @@ y_alpha_fixe_et_beta_gamma_à_optim = scipy.optimize.curve_fit(lambda t,a,b,c: a
 plt.plot(zHD,y_alpha_fixe_et_beta_gamma_à_optim[0][0]+y_alpha_fixe_et_beta_gamma_à_optim[0][1]*np.log(zHD*y_alpha_fixe_et_beta_gamma_à_optim[0][2]), c ='purple' ,label='Fitted Curve alpha_fixe_et_beta_gamma_à_optim')
 
 
-"""
+
 print("on calcule la différence pour z = ",zHD[1700])
 shift = MU_SHOES[1700]-MU_SHOES_alpha_fixé_et_gamma_à_optimiser[1700]
 print("différence obtenue avec l'algo = ",shift)
+"""
+plt.legend()
+
+plt.figure(2)
+residuals_sans_modif = []
+residuals_avec_modif = []
+
+for i in range(1701):
+     residuals_sans_modif.append(MU_SHOES[i]-MU_theory_flatLCDM[i])
+     residuals_avec_modif.append(MU_SHOES_alpha_fixé_et_gamma_à_optimiser[i]-MU_theory_flatLCDM[i])
+
+plt.scatter(zHD,residuals_sans_modif,c='green',label="luminosity non-modified")
+plt.scatter(zHD,residuals_avec_modif,c='red',label='luminosity modified')
+plt.xscale('log')
+plt.legend()
+
 plt.show()
 
 

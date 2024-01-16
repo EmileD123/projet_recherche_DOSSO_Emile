@@ -69,7 +69,7 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
         likelihood.append(np.dot(A,DeltaD)) 
     return likelihood
 
-delta = 0.1
+delta = 0.001
 gamma = np.arange(4.5,5.5, delta) #gamma = np.arange(-0.1, 0.601, delta) 
 gamma = gamma.astype(float)
 Z = likelihood_func(gamma,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)

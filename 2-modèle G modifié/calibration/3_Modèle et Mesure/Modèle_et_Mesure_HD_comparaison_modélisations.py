@@ -32,7 +32,7 @@ plt.figure(1)
 plt.scatter(zHD,MU_SHOES , c='black', marker='.', label='Original Data')
 y = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES)
 #print(y)
-plt.plot(zHD,39.29971437+2.31618666*np.log(zHD*6.60324733),linestyle ='--'  ,c = 'black', label='Fitted Curve Original Data')
+#plt.plot(zHD,39.29971437+2.31618666*np.log(zHD*6.60324733),linestyle ='--'  ,c = 'black', label='Fitted Curve Original Data')
 
 
 plt.ylabel('modulus distance')
@@ -45,8 +45,8 @@ MU_SHOES_alpha_fixé_et_gamma_à_optimiser = [] ; MU_SHOES_alpha_fixé_et_gamma_
 
 
 for i in range(1701):
-        #alpha_fixé_et_gamma_à_optimiser : gamma = 0.258 (+0.12 -0.12)
-        mu_alpha_fixé_et_gamma_à_optimiser = MU_SHOES[i] + (5/2)*(0.258)*np.log10((1+0.18*(1/(1+zHD[i])))/(1+0.18))
+        #alpha_fixé_et_gamma_à_optimiser : gamma = 0.258 (+0.12 -0.12) pour modif modèle uniquement ; gamma = 4.847 (+? -?) pour modifs modèle et données
+        mu_alpha_fixé_et_gamma_à_optimiser = MU_SHOES[i] + (5/2)*(4.847)*np.log10((1+0.18*(1/(1+zHD[i])))/(1+0.18))
         MU_SHOES_alpha_fixé_et_gamma_à_optimiser.append(mu_alpha_fixé_et_gamma_à_optimiser)
         """
         #alpha_fixé_et_gamma_à_optim_forme_exp : gamma = -0.23 (+0.108 -0.109)
@@ -61,7 +61,8 @@ for i in range(1701):
 plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optimiser , c='pink', marker='.', label='alpha_fixé_et_gamma_à_optimiser ')
 y_alpha_fixé_et_gamma_à_optimiser = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES_alpha_fixé_et_gamma_à_optimiser)
 #print(y_alpha_fixé_et_gamma_à_optimiser)
-plt.plot(zHD,y_alpha_fixé_et_gamma_à_optimiser[0][0]+y_alpha_fixé_et_gamma_à_optimiser[0][1]*np.log(zHD*y_alpha_fixé_et_gamma_à_optimiser[0][2]), linestyle ='--'  ,c ='r' ,label='Fitted Curve alpha_fixé_et_gamma_à_optimiser')
+#plt.plot(zHD,y_alpha_fixé_et_gamma_à_optimiser[0][0]+y_alpha_fixé_et_gamma_à_optimiser[0][1]*np.log(zHD*y_alpha_fixé_et_gamma_à_optimiser[0][2]), linestyle ='--'  ,c ='r' ,label='Fitted Curve alpha_fixé_et_gamma_à_optimiser')
+
 """
 #alpha_fixé_et_gamma_à_optim_forme_exp 35.16131108 2.31234324 39.39771072
 plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optim_forme_exp , c='blue', marker='.', label='alpha_fixé_et_gamma_à_optim_forme_exp')
@@ -116,6 +117,7 @@ for z in zHD:
 
 plt.plot(zHD,MU_theory_flatLCDM,c='black',label='Flat LCDM')
 plt.plot(zHD,MU_only_alpha ,c='r',label='only_alpha')
+plt.legend()
 """
 plt.plot(zHD,MU_alpha_fixé_exp,c='orange',label='alpha_fixé_exp')
 plt.plot(zHD,MU_alpha_fixé_beta_exp,c='g',label='alpha_fixé_beta_exp')
@@ -125,12 +127,12 @@ plt.figure(2)
 plt.ylabel('modulus distance residuals')
 plt.xlabel('redshift')
 plt.xscale('log')
-plt.title('green = non-modified ; red = modified')
+plt.title('residuals with or without change of G')
 residuals_sans_modif = []
 for i in range(len(zHD)):
     diff =  MU_SHOES[i] - MU_theory_flatLCDM[i]
     residuals_sans_modif.append(diff)
-plt.scatter(zHD,residuals_sans_modif,c='green',marker = '.',label='residuals with models and data non-modified')
+plt.scatter(zHD,residuals_sans_modif,c='green',label='residuals with models and data non-modified')
 
 
 """
@@ -142,9 +144,9 @@ plt.title('residuals with models and data modified')
 """
 residuals_avec_modif = []
 for i in range(len(zHD)):
-    diff =  MU_SHOES_alpha_fixé_et_gamma_à_optimiser[i] - MU_only_alpha[i]
+    diff =  MU_SHOES_alpha_fixé_et_gamma_à_optimiser[i] - MU_only_alpha[i] # -0.18 # permet de superoposer une partie des points rouges et verts (seulement aux z plus faibles , ce qui montre que ldécalage entre rouget vert dépend de z)
     residuals_avec_modif.append(diff)
-plt.scatter(zHD,residuals_avec_modif,c='red',marker = '.',label='residuals with models and data modified')
+plt.scatter(zHD,residuals_avec_modif,c='red',label='residuals with models and data modified')
 plt.legend()
 plt.show()
 

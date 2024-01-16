@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 import scipy.integrate as spi
 import csv
    
-    
+plt.figure(1)   
 # Initialize two empty lists to store the values from the columns
 zHD = []
 MU_SHOES = []
@@ -34,7 +34,7 @@ plt.xlabel('redshift')
 plt.xscale('log')
 plt.title('Hubble diagram of SNe IA')
 
-residuals = []
+
 
 
 #on trace la courbe théorique selon le modèle LCDM
@@ -44,7 +44,6 @@ for z in zHD:
         return (1/(73.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6)
     result = spi.quad(f,0,z)
     result_final = 5*np.log10(((1+z)*result[0])/10)
-    #residuals = ? <- difficulté : associer à chaque entité de MU_SHOES un redshift : pas si simple parce qu'il y a plus de light curves (1701) que de SNE1A (1500 et des bananes) donc à priori certaines instances de MU_SHOES ont des z identiques ...   
     MU_theory_flatLCDM.append(result_final)
 
 
@@ -55,6 +54,8 @@ for z in zHD:
     result = spi.quad(f,0,z)
     result_final = 5*np.log10(((1+z)*result[0])/10)
     MU_only_alpha.append(result_final)
+
+
 """
 MU_alpha_fixé_exp= [] 
 for z in zHD:
@@ -74,9 +75,9 @@ for z in zHD:
 """
 
 
-
-plt.plot(zHD,MU_theory_flatLCDM,c='b',label='Flat LCDM')
-plt.plot(zHD,MU_only_alpha ,c='r',label='only_alpha')
+plt.plot(zHD,MU_theory_flatLCDM,c='green',label='Flat LCDM')
+plt.plot(zHD,MU_only_alpha ,c='red',label='only_alpha')
+plt.legend()
 """
 plt.plot(zHD,MU_alpha_fixé_exp,c='orange',label='alpha_fixé_exp')
 plt.plot(zHD,MU_alpha_fixé_beta_exp,c='g',label='alpha_fixé_beta_exp')
@@ -98,5 +99,24 @@ plt.ylabel('modulus distance')
 plt.xlabel('redshift')
 plt.xscale('log')
 plt.legend()
+
 """
+plt.figure(2)
+residuals_sans_modif = []
+residuals_avec_modif = []
+
+for i in range (1701):
+    residuals_sans_modif.append(MU_SHOES[i]-MU_theory_flatLCDM[i])
+    residuals_avec_modif.append(MU_SHOES[i]-MU_only_alpha[i])
+
+plt.scatter(zHD,residuals_sans_modif,c='green',label='model non-modified')
+plt.scatter(zHD,residuals_avec_modif,c='red',label='model with introduction of alpha')
+plt.title('residuals with or without modification')
+plt.xscale('log')
+plt.xlabel('redshift')
+plt.ylabel('residuals')
+
+
+plt.legend()
+
 plt.show()
