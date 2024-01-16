@@ -54,25 +54,25 @@ CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOE
 
 
 #on définit la fonction qui calcule la likelihood
-def likelihood_func(gamma,beta,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
+def likelihood_func(gamma,alpha,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
     likelihood=[]
     for i in range(len(gamma)):
         likelihood.append([])
     for j in range(len(gamma)):
-        for k in range(len(beta)):
+        for k in range(len(alpha)):
             DeltaD = np.empty(1701)                            
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(((1+(0.18)*np.exp(x/((1+x)*beta[k][k])))**(1/2))*(73.6)*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques FlatLambdaCDM dans Brout et al. 2022 = Analysis on cosmological constraints
+                    return (1/(((1+alpha[k][k]*(1/(1+x)))**(1/2))*(73.6)*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques FlatLambdaCDM dans Brout et al. 2022 = Analysis on cosmological constraints
                 result = spi.quad(f,0,zHD[i])                                               
                 mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 
                 if CEPH_DIST[i] == -9.0 : #on vérifie si la mesure est relié à la mesure d'une distance avec une Cepheid (CEPH_DIST[i] == -9.0 signifie que ce n'est pas le cas)
-                    mu = mu_shoes + (5/2)*gamma[j][j]*np.log10((1+0.18*np.exp((zHD[i]/(1+zHD[i]))/(beta[k][k])))/(1+0.18)) - mu_theory
+                    mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+alpha[k][k]*(1/(1+zHD[i])))/(1+alpha[k][k])))-mu_theory #alpha = 0.18
                     DeltaD[i]=mu
                 else :
-                    mu = mu_shoes + (5/2)*gamma[j][j]*np.log10((1+0.18*np.exp((zHD[i]/(1+zHD[i]))/(beta[k][k])))/(1+0.18)) - mu_cepheid
+                    mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+alpha[k][k]*(1/(1+zHD[i])))/(1+alpha[k][k])))-mu_cepheid #alpha = 0.18
                     DeltaD[i]=mu
             DeltaD_transpose = np.transpose(DeltaD)
                 #on calcule la likelihood 
@@ -85,34 +85,30 @@ def likelihood_func(gamma,beta,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 
-#maintenant on va tenter de tracer le diagramme (gamma_range,beta) en faisant varier ces paramètres et trouver le minimum de la likelihood
-delta = 1
-gamma_range = np.arange(-5,-2, delta) 
-beta_range = np.arange(-5,-2, delta)        
-gamma_range, beta_range = np.meshgrid(gamma_range, beta_range,indexing='ij')
-gamma_range = gamma_range.astype(float);  beta_range = beta_range.astype(float)
-Chi2 = likelihood_func(gamma_range,beta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+#maintenant on va tenter de tracer le diagramme (gamma_range,alpha) en faisant varier ces paramètres et trouver le minimum de la likelihood
+delta = 0.1
+gamma_range = np.arange(0,5.1, delta) 
+alpha_range = np.arange(0.18,5.28, delta)        
+gamma_range, alpha_range = np.meshgrid(gamma_range, alpha_range,indexing='ij')
+gamma_range = gamma_range.astype(float);  alpha_range = alpha_range.astype(float)
+Chi2 = likelihood_func(gamma_range,alpha_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
-#Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
-#Chi2[0][0] = 10000
-print(" Chi2 = \n",Chi2) ; print("gammma range = \n",gamma_range,"beta range = \n", beta_range)
+
 
 
 
 min = Chi2[0][0]
 CL_68 = []
-CL_68_beta = []
+CL_68_alpha = []
 CL_68_gamma = []
 CL_95 = []
-petits_chi2_gamma = []
-petits_chi2_beta = []
 
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
-            min = Chi2[i][j] ; arg_min_gamma = gamma_range[i][j] ; arg_min_beta = beta_range[i][j]
-print("gamma= ",arg_min_gamma,"; beta= ", arg_min_beta, "; min =", min)
-             #/(len(gamma_range)-1)                 #/(len(beta_range)-1)
+            min = Chi2[i][j] ; arg_min_gamma = gamma_range[i][j] ; arg_min_alpha = alpha_range[i][j]
+print(" alpha= ", arg_min_alpha,"; gamma= ",arg_min_gamma, "; min =", min)
+             #/(len(gamma_range)-1)                 #/(len(alpha_range)-1)
 
 
 for i in range(len(Chi2)) :
@@ -120,22 +116,19 @@ for i in range(len(Chi2)) :
         if  Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
             CL_95.append([Chi2[i][j]])
             CL_95.append(gamma_range[i][j])
-            CL_95.append(beta_range[i][j])
+            CL_95.append(alpha_range[i][j])
 
 
         if Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
             CL_68.append([Chi2[i][j]])
             CL_68.append(gamma_range[i][j])
-            CL_68.append(beta_range[i][j])
-            CL_68_beta.append(beta_range[i][j])
+            CL_68.append(alpha_range[i][j])
+            CL_68_alpha.append(alpha_range[i][j])
             CL_68_gamma.append(gamma_range[i][j])
 
-        if Chi2[i][j]<=2110 and Chi2[i][j] != nan:
-            petits_chi2_beta.append(beta_range[i][j])
-            petits_chi2_gamma.append(gamma_range[i][j])
 
 
-merge_sort(CL_68_gamma) ; merge_sort(CL_68_beta)
+merge_sort(CL_68_gamma) ; merge_sort(CL_68_alpha)
 
 
 print("Cl_95 =", CL_95)
@@ -143,10 +136,9 @@ print("nb d'éléments CL_95 =",len(CL_95)/3)
 print("CL_68 =", CL_68)
 print("nb d'éléments CL_68 =",len(CL_68)/3)
 print("CL_68_gamma =", CL_68_gamma)
-print("CL_68_beta =", CL_68_beta)
-print("petits_chi2_gamma",petits_chi2_gamma)
-print("petits_chi2_beta",petits_chi2_beta)
-#print("Chi2[10][10] = ",Chi2[10][10],"gamma_range[10][10] = ",gamma_range[10][10],"beta_range[10][10] = ",beta_range[10][10])
+print("CL_68_alpha =", CL_68_alpha)
+
+#print("Chi2[10][10] = ",Chi2[10][10],"gamma_range[10][10] = ",gamma_range[10][10],"alpha_range[10][10] = ",alpha_range[10][10])
 
 """
 # Create a 3D plot
@@ -157,18 +149,18 @@ ax = fig.add_subplot(111, projection='3d')
 ax.view_init(elev=20, azim=45)  # Change elev and azim to set the view angle
 
 # Plot the 3D surface
-surface = ax.plot_surface(gamma_range, beta_range, Chi2, cmap='viridis')
+surface = ax.plot_surface(gamma_range, alpha_range, Chi2, cmap='viridis')
 
 # Add color bar to show values
 fig.colorbar(surface, shrink=0.5, aspect=5)
 
 # Label axes (optional)
 ax.set_xlabel('gamma')
-ax.set_ylabel('beta')
+ax.set_ylabel('alpha')
 ax.set_zlabel('Likelihood')
 
 
-CS1 = plt.contour(gamma_range, beta_range , Chi2)
+CS1 = plt.contour(gamma_range, alpha_range , Chi2)
    
 fmt = {}
 strs = ['1', '2', '3', '4', '5', '6', '7']
