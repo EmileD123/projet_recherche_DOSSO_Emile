@@ -87,8 +87,8 @@ def likelihood_func(gamma,alpha,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 #maintenant on va tenter de tracer le diagramme (gamma_range,alpha) en faisant varier ces paramètres et trouver le minimum de la likelihood
 delta = 0.1
-gamma_range = np.arange(0,5.1, delta) 
-alpha_range = np.arange(0.18,5.28, delta)        
+gamma_range = np.arange(3.5,5.6, delta) 
+alpha_range = np.arange(5,7.1, delta)        
 gamma_range, alpha_range = np.meshgrid(gamma_range, alpha_range,indexing='ij')
 gamma_range = gamma_range.astype(float);  alpha_range = alpha_range.astype(float)
 Chi2 = likelihood_func(gamma_range,alpha_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
