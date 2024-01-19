@@ -72,19 +72,17 @@ def likelihood_func(gamma,H0,OmegaMatter,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
                     #on calcule la transposée
                     DeltaD_transpose = np.transpose(DeltaD)
                     #on calcule la likelihood 
-            A = np.dot(DeltaD_transpose,np.linalg.inv(mat_cov))
-            likelihood.append(np.dot(A,DeltaD)) 
+                A = np.dot(DeltaD_transpose,np.linalg.inv(mat_cov))
+                likelihood[k][l].append(np.dot(A,DeltaD)) 
     return likelihood
 
-delta = 0.001
-gamma = np.arange(4.5,5.5, delta) ; H0 = np.arrange() ; OmegaMatter = np.arange() #gamma = np.arange(-0.1, 0.601, delta) 
+delta = 1
+gamma = np.arange(0,11, delta) ; H0 = np.arange(65,76,delta) ; OmegaMatter = np.arange(25,36,delta) #gamma = np.arange(-0.1, 0.601, delta) 
 gamma, H0, OmegaMatter = np.meshgrid(gamma,H0,OmegaMatter,indexing='ij')
 gamma = gamma.astype(float) ; H0 = H0.astype(float) ; OmegaMatter = OmegaMatter.astype(float)
 Chi2 = likelihood_func(gamma,H0,OmegaMatter,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
-#Chi2[0][10] = 0 on supprime un outlier (valeur à 10**8)
-#Chi2[0][0] = 10000
-print(Chi2) ; print(gamma)
+Chi2 = np.array(Chi2)
+Chi2 = Chi2.astype(float)
 
 
 
@@ -97,46 +95,27 @@ for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         for k in range(len(Chi2[i][j])) :
             if min >= Chi2[i][j][k] and Chi2[i][j][k]!= 0 and Chi2[i][j][k]!= nan:
-                min = Chi2[i][j][k] ; arg_min_gamma = gamma[i][j][k] ; arg_min_H0 = H0[i][j][k] ; arg_min_OmegaMatter = OmegaMatter[i][j][k] 
-print("gamma= ",arg_min_gamma,"H0= ",arg_min_H0,"OmegaMatter= ",arg_min_OmegaMatter,"; min =", min)
+                min = Chi2[i][j][k] ; arg_min_gamma = gamma[i][j][k] ; arg_min_H0 = H0[i][j][k] ; arg_min_OmegaMatter = OmegaMatter[i][j][k]/100
+print("gamma= ",arg_min_gamma,"; H0= ",arg_min_H0,"; OmegaMatter= ",arg_min_OmegaMatter,"; min =", min)
 
 
 
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         for k in range(len(Chi2[i][j])) :
-            if Chi2[i][j][k]<=min+#TODO and Chi2[i]!= nan :
-                CL_95.append(gamma[i][j][k]) ; CL_95.append(H0[i][j][k]) ; CL_95.append(OmegaMatter[i][j][k])
+            if Chi2[i][j][k]<=min+8.02 and Chi2[i][j][k]!= nan :
+                CL_95.append(gamma[i][j][k]) ; CL_95.append(H0[i][j][k]) ; CL_95.append(OmegaMatter[i][j][k]/100)
                 CL_95.append([Chi2[i]])
-            if Chi2[i][j][k]<=min+3.5 and Chi2[i]!= nan:
-                CL_68.append(gamma[i][j][k]) ; CL_68.append(H0[i][j][k]) ; CL_68.append(OmegaMatter[i][j][k])
+            if Chi2[i][j][k]<=min+3.5 and Chi2[i][j][k]!= nan:
+                CL_68.append(gamma[i][j][k]) ; CL_68.append(H0[i][j][k]) ; CL_68.append(OmegaMatter[i][j][k]/100)
                 CL_68.append([Chi2[i]])
-                CL_68.append(i)
+                CL_68_gamma.append(gamma[i][j][k]);CL_68_H0.append(H0[i][j][k]);CL_68_OmegaMatter.append(OmegaMatter[i][j][k]/100)
         
 
 print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
+print("nb d'éléments CL_95 =",len(CL_95)/4)
 print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
-"""
-fig, ax = plt.subplots()
-im = ax.imshow(Chi2, interpolation ='bilinear',
-               origin ='lower',
-               cmap ="bone",extent=(gamma[0],gamma[len(gamma)-1],gamma[0],gamma[len(gamma)-1])) #marche pas -> à changer !
-  
-levels = [min+2.3,min+6.7]
-CS = ax.contour(Chi2, levels, 
-                origin ='lower',
-                cmap ='Greens',
-                linewidths = 2,extent=(gamma[0],gamma[len(gamma)-1],gamma[0],gamma[len(gamma)-1]))
-
-ax.set_xlabel('OmegaM', fontsize=12)  
-ax.set_ylabel('OmegaLambda', fontsize=12)
-
-ax.clabel(CS, levels,
-          inline = 1, 
-          fmt ='% 1.1f',
-          fontsize = 9)
-
-plt.show()
-"""
+print("nb d'éléments CL_68 =",len(CL_68)/4)
+print('CL_68_gamma',CL_68_gamma)
+print('CL_68_H0',CL_68_H0)
+print('CL_68_OmegaMatter',CL_68_OmegaMatter)

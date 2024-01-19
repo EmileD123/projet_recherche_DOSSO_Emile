@@ -1,0 +1,6 @@
+*delta = 0.01; Omegam*H0 E [25;35]*[65;75] :
+
+Om=  0.2860000000000005 ; H0=  73.29999999999953 ; min = 1522.785074729109
+
+↓ Toutes les valeurs de Omegam sont à diviser par 100 :
+

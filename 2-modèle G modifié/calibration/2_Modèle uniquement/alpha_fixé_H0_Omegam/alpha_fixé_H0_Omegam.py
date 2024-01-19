@@ -59,7 +59,7 @@ def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(((1+0.18*(x/(1+x)))**(1/2))*H0[k][k]*(((OmegaMatter[j][j]/100)*((1+x)**3)+(1-(OmegaMatter[j][j]/100)))**(1/2))))*(3*(10**5))*(10**6) #🔴Omegam divisé par 100 ici ! ; calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
+                    return (1/(((1+0.18*(x/(1+x)))**(1/2))*H0[k][k]*((((OmegaMatter[j][j])/100)*((1+x)**3)+(1-((OmegaMatter[j][j])/100)))**(1/2))))*(3*(10**5))*(10**6) #🔴Omegam divisé par 100 ici ! ; calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
                 result = spi.quad(f,0,zHD[i])                                               #idem
                 mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 
@@ -82,9 +82,9 @@ def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 #maintenant on va tenter de tracer le diagramme (Omegam,Omegalambda) en faisant varier ces paramètres et trouver le minimum de la likelihood
 delta = 0.1
-OmegaM = np.arange(25, 35.1, delta) 
+OmegaM = np.arange(25, 35.1, delta) ; OmegaM = OmegaM[:-1]
 H0 = np.arange(65, 75.1, delta)                #OmegaM.copy().T 
-OmegaM, H0 = np.meshgrid(OmegaM, H0)
+OmegaM, H0 = np.meshgrid(OmegaM, H0,indexing='ij')
 OmegaM = OmegaM.astype(float);  H0 = H0.astype(float)
 Chi2 = likelihood_func(OmegaM,H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
@@ -99,20 +99,19 @@ CL_68 = [] ; CL_95 = [] ; CL_68_Omegam = []; CL_68_H0 = []
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
-            min = Chi2[i][j] ; arg_min_Om = OmegaM[0][i] ; arg_min_H0 =H0[j][0]
-print("Om= ", arg_min_Om, "; H0= ", arg_min_H0, "; min =", min)
-             #/(len(OmegaM)-1)                 #/(len(OmegaL)-1)
+            min = Chi2[i][j] ; arg_min_Om = OmegaM[i][j] ; arg_min_H0 =H0[i][j]
+print("Om= ", arg_min_Om/100, "; H0= ", arg_min_H0, "; min =", min)
 
 
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
-            CL_95.append([Chi2[i][j]]);CL_95.append(OmegaM[i][j]);CL_95.append(H0[i][j])
+            CL_95.append([Chi2[i][j]]);CL_95.append(OmegaM[i][j]/100);CL_95.append(H0[i][j])
             
 
         if min <= Chi2[i][j] and Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
-            CL_68.append([Chi2[i][j]]);CL_68.append(OmegaM[i][j]);CL_68.append(H0[i][j])
-            CL_68_Omegam.append(OmegaM[i][j])
+            CL_68.append([Chi2[i][j]]);CL_68.append(OmegaM[i][j]/100);CL_68.append(H0[i][j])
+            CL_68_Omegam.append(OmegaM[i][j]/100)
             CL_68_H0.append(H0[i][j])
 
 merge_sort(CL_68_Omegam);merge_sort(CL_68_H0)
