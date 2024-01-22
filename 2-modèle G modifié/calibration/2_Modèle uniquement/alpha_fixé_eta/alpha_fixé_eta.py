@@ -80,40 +80,40 @@ def likelihood_func(eta,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 delta = 100000
 eta_range = np.arange(0,1100000, delta) 
 eta_range = eta_range.astype(float)
-Z = likelihood_func(eta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprme un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z) ; print(eta_range)
+Chi2 = likelihood_func(eta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
+#Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
+#Chi2[0][0] = 10000
+print(Chi2) ; print(eta_range)
 
 
 
-min = Z[0]
-CL_68 = [] ; CL_95 = []
+min = Chi2[0]
+CI_1σ = [] ; CI_2σ = []
 
 
-for i in range(len(Z)) :
-    if min >= Z[i] and Z[i] != 0 and Z[i] != nan:
-        min = Z[i] ; arg_min_eta = eta_range[i]
+for i in range(len(Chi2)) :
+    if min >= Chi2[i] and Chi2[i] != 0 and Chi2[i] != nan:
+        min = Chi2[i] ; arg_min_eta = eta_range[i]
 print("eta= ",arg_min_eta, "; min=", min)
              #/(len(eta_range)-1)                 #/(len(eta_range)-1)
 
 
-for i in range(len(Z)) :
-    if min <= Z[i] and Z[i]<=min+6.17 and Z[i] != nan:
-        CL_95.append([Z[i]])
-        CL_95.append(eta_range[i])
+for i in range(len(Chi2)) :
+    if min <= Chi2[i] and Chi2[i]<=min+6.17 and Chi2[i] != nan:
+        CI_2σ.append([Chi2[i]])
+        CI_2σ.append(eta_range[i])
 
-    if min <= Z[i] and Z[i]<=min+2.3 and Z[i] != nan:
-        CL_68.append([Z[i]])
-        CL_68.append(eta_range[i])
+    if min <= Chi2[i] and Chi2[i]<=min+2.3 and Chi2[i] != nan:
+        CI_1σ.append([Chi2[i]])
+        CI_1σ.append(eta_range[i])
 
 
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/2)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/2)
+print("CL_95 =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/2)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/2)
 
 
 

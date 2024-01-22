@@ -76,51 +76,51 @@ def likelihood_func(alpha,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 delta = 0.001
 alpha = np.arange(-0.2, 0.201, delta) 
 alpha = alpha.astype(float)
-Z = likelihood_func(alpha,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprime un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z) ; print(alpha)
+Chi2 = likelihood_func(alpha,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
+#Chi2[0][10] = 0 on supprime un outlier (valeur à 10**8)
+#Chi2[0][0] = 10000
+print(Chi2) ; print(alpha)
 
 
 
-min = Z[20]
-CL_68 = []
-CL_95 = []
-for i in range(len(Z)) :
-    if min >= Z[i] and Z[i]!= 0 and Z[i]!= nan:
-        min = Z[i] ; arg_min_alpha = alpha[i]
+min = Chi2[20]
+CI_1σ = []
+CI_2σ = []
+for i in range(len(Chi2)) :
+    if min >= Chi2[i] and Chi2[i]!= 0 and Chi2[i]!= nan:
+        min = Chi2[i] ; arg_min_alpha = alpha[i]
 print("alpha= ",arg_min_alpha,"; min =", min)
              #/(len(alpha)-1)                 #/(len(alpha)-1)
 
 
-for i in range(len(Z)) :
-    if Z[i]<=(min+3.841)  and Z[i]!= nan:
-        CL_95.append(alpha[i])
-        CL_95.append([Z[i]])
-        CL_95.append(i)
-    if Z[i]<=(min+1) and Z[i]!= nan:
-        CL_68.append(alpha[i])
-        CL_68.append([Z[i]])
-        CL_68.append(i)
+for i in range(len(Chi2)) :
+    if Chi2[i]<=(min+4)  and Chi2[i]!= nan:
+        CI_2σ.append(alpha[i])
+        CI_2σ.append([Chi2[i]])
+        CI_2σ.append(i)
+    if Chi2[i]<=(min+1) and Chi2[i]!= nan:
+        CI_1σ.append(alpha[i])
+        CI_1σ.append([Chi2[i]])
+        CI_1σ.append(i)
         
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
+print("CI_2σ =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
 
 
 
 
 """
 fig, ax = plt.subplots()
-im = ax.imshow(Z, interpolation ='bilinear',
+im = ax.imshow(Chi2, interpolation ='bilinear',
                origin ='lower',
                cmap ="bone",extent=(-0.2,0.2,-0.2,0.2)) 
   
 levels = [min+2.3,min+6.7]
-CS = ax.contour(Z, levels, 
+CS = ax.contour(Chi2, levels, 
                 origin ='lower',
                 cmap ='Greens',
                 linewidths = 2,extent=(-0.2,0.2,-0.2,0.2))
@@ -144,7 +144,7 @@ ax = fig.add_subplot(111, projection='3d')
 ax.view_init(elev=20, azim=45)  # Change elev and azim to set the view angle
 
 # Plot the 3D surface
-surface = ax.plot_surface(OmegaM, OmegaL, Z, cmap='viridis')
+surface = ax.plot_surface(OmegaM, OmegaL, Chi2, cmap='viridis')
 
 # Add color bar to show values
 fig.colorbar(surface, shrink=0.5, aspect=5)
@@ -155,7 +155,7 @@ ax.set_ylabel('OmegaL')
 ax.set_zlabel('Likelihood')
 
 
-CS1 = plt.contour(OmegaM, OmegaL, Z)
+CS1 = plt.contour(OmegaM, OmegaL, Chi2)
    
 fmt = {}
 strs = ['1', '2', '3', '4', '5', '6', '7']

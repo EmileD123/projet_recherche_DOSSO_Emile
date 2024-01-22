@@ -77,40 +77,40 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 delta = 0.001
 gamma_range = np.arange(-0.1,0.001, delta) 
 gamma_range = gamma_range.astype(float)
-Z = likelihood_func(gamma_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprme un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z) ; print(gamma_range)
+Chi2 = likelihood_func(gamma_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
+#Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
+#Chi2[0][0] = 10000
+print(Chi2) ; print(gamma_range)
 
 
 
-min = Z[0]
-CL_68 = [] ; CL_95 = []
+min = Chi2[0]
+CI_1σ = [] ; CI_2σ = []
 
 
-for i in range(len(Z)) :
-    if min >= Z[i] and Z[i] != 0 and Z[i] != nan:
-        min = Z[i] ; arg_min_gamma = gamma_range[i]
+for i in range(len(Chi2)) :
+    if min >= Chi2[i] and Chi2[i] != 0 and Chi2[i] != nan:
+        min = Chi2[i] ; arg_min_gamma = gamma_range[i]
 print("gamma= ",arg_min_gamma, "; min=", min)
              #/(len(gamma_range)-1)                 #/(len(gamma_range)-1)
 
 
-for i in range(len(Z)) :
-    if min <= Z[i] and Z[i]<=min+6.17 and Z[i] != nan:
-        CL_95.append([Z[i]])
-        CL_95.append(gamma_range[i])
+for i in range(len(Chi2)) :
+    if min <= Chi2[i] and Chi2[i]<=min+4 and Chi2[i] != nan:
+        CI_2σ.append([Chi2[i]])
+        CI_2σ.append(gamma_range[i])
 
-    if min <= Z[i] and Z[i]<=min+2.3 and Z[i] != nan:
-        CL_68.append([Z[i]])
-        CL_68.append(gamma_range[i])
+    if min <= Chi2[i] and Chi2[i]<=min+1 and Chi2[i] != nan:
+        CI_1σ.append([Chi2[i]])
+        CI_1σ.append(gamma_range[i])
 
 
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/2)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/2)
+print("CL_95 =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/2)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/2)
 
 
 
@@ -118,12 +118,12 @@ print("nb d'éléments CL_68 =",len(CL_68)/2)
 
 """
 fig, ax = plt.subplots()
-im = ax.imshow(Z, interpolation ='bilinear',
+im = ax.imshow(Chi2, interpolation ='bilinear',
                origin ='lower',
                cmap ="bone",extent=(-0.25,0.26,-0.25,0.26)) 
   
 levels = [min+2.3,min+6.7]
-CS = ax.contour(Z, levels, 
+CS = ax.contour(Chi2, levels, 
                 origin ='lower',
                 cmap ='Greens',
                 linewidths = 2,extent=(-0.25,0.26,-0.25,0.26))

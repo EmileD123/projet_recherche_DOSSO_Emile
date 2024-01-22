@@ -86,7 +86,7 @@ Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
 
 
 min = Chi2[0]
-CL_68 = [] ; CL_95 = [] 
+CL_68 = [] ; CI_2σ= [] 
 
 for i in range(len(Chi2)) :
     if min >= Chi2[i] and Chi2[i]!= 0 and Chi2[i]!= nan:
@@ -97,16 +97,16 @@ print("H0= ",arg_min_H0,"; min =", min)
 
 for i in range(len(Chi2)) :
     if min <= Chi2[i] and Chi2[i]<=min+4 and Chi2[i]!= nan:
-        CL_95.append(H0[i])
-        CL_95.append([Chi2[i]])
+        CI_2σ.append(H0[i])
+        CI_2σ.append([Chi2[i]])
 
     if min <= Chi2[i] and Chi2[i]<=min+1 and Chi2[i] != nan:
         CL_68.append(H0[i])
         CL_68.append([Chi2[i]])
         
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/2)
+print("CI_2σ=", CI_2σ)
+print("nb d'éléments CI_2σ=",len(CI_2σ)/2)
 print("CL_68 =", CL_68)
 print("nb d'éléments CL_68 =",len(CL_68)/2)
 

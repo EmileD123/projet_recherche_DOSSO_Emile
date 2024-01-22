@@ -74,8 +74,8 @@ def likelihood_func(beta,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 #maintenant on va tenter de tracer le diagramme (beta_range,beta) en faisant varier ces paramètres et trouver le minimum de la likelihood
-delta = 0.1
-beta_range = np.arange(-1,1, delta) 
+delta = 0.001
+beta_range = np.arange(-0.5,0.5, delta) 
 beta_range = beta_range.astype(float)
 Z = likelihood_func(beta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Z = np.array(Z) ; Z = Z.astype(float)
@@ -86,7 +86,7 @@ print(Z) ; print(beta_range)
 
 
 min = Z[0]
-CL_68 = [] ; CL_95 = []
+CI_1σ = [] ; CI_2σ = []
 
 
 for i in range(len(Z)) :
@@ -97,20 +97,20 @@ print("beta= ",arg_min_beta, "; min=", min)
 
 
 for i in range(len(Z)) :
-    if min <= Z[i] and Z[i]<=min+6.17 and Z[i] != nan:
-        CL_95.append([Z[i]])
-        CL_95.append(beta_range[i])
+    if min <= Z[i] and Z[i]<=min+4 and Z[i] != nan:
+        CI_2σ.append([Z[i]])
+        CI_2σ.append(beta_range[i])
 
-    if min <= Z[i] and Z[i]<=min+2.3 and Z[i] != nan:
-        CL_68.append([Z[i]])
-        CL_68.append(beta_range[i])
+    if min <= Z[i] and Z[i]<=min+1 and Z[i] != nan:
+        CI_1σ.append([Z[i]])
+        CI_1σ.append(beta_range[i])
 
 
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/2)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/2)
+print("CI_2σ =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/2)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/2)
 
 
 

@@ -7,10 +7,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
+from merge_sort import merge_sort as merge_sort
 
 
-file1_path = '../../../Pantheon+SH0ES_STAT+SYS.txt'
-file2_path = '../../../Pantheon+Shoes data.txt'
+
+file1_path = '../Pantheon+SH0ES_STAT+SYS.txt'
+file2_path = '../Pantheon+Shoes data.txt'
 
 #on s'attaque à la matrice de covariance
 with open(file1_path) as file:
@@ -76,7 +78,7 @@ def likelihood_func(gamma,H0,OmegaMatter,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
                 likelihood[k][l].append(np.dot(A,DeltaD)) 
     return likelihood
 
-delta = 1
+delta = 0.5
 gamma = np.arange(0,11, delta) ; H0 = np.arange(65,76,delta) ; OmegaMatter = np.arange(25,36,delta) #gamma = np.arange(-0.1, 0.601, delta) 
 gamma, H0, OmegaMatter = np.meshgrid(gamma,H0,OmegaMatter,indexing='ij')
 gamma = gamma.astype(float) ; H0 = H0.astype(float) ; OmegaMatter = OmegaMatter.astype(float)
@@ -88,9 +90,9 @@ Chi2 = Chi2.astype(float)
 
 
 min = Chi2[0][0][0]
-CL_68 = []
-CL_95 = []
-CL_68_gamma = [] ; CL_68_H0 = [] ; CL_68_OmegaMatter = []
+CI_1σ = []
+CI_2σ = []
+CI_1σ_gamma = [] ; CI_1σ_H0 = [] ; CI_1σ_OmegaMatter = []
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         for k in range(len(Chi2[i][j])) :
@@ -104,18 +106,20 @@ for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         for k in range(len(Chi2[i][j])) :
             if Chi2[i][j][k]<=min+8.02 and Chi2[i][j][k]!= nan :
-                CL_95.append(gamma[i][j][k]) ; CL_95.append(H0[i][j][k]) ; CL_95.append(OmegaMatter[i][j][k]/100)
-                CL_95.append([Chi2[i]])
+                CI_2σ.append(gamma[i][j][k]) ; CI_2σ.append(H0[i][j][k]) ; CI_2σ.append(OmegaMatter[i][j][k]/100)
+                #CI_2σ.append([Chi2[i]])
             if Chi2[i][j][k]<=min+3.5 and Chi2[i][j][k]!= nan:
-                CL_68.append(gamma[i][j][k]) ; CL_68.append(H0[i][j][k]) ; CL_68.append(OmegaMatter[i][j][k]/100)
-                CL_68.append([Chi2[i]])
-                CL_68_gamma.append(gamma[i][j][k]);CL_68_H0.append(H0[i][j][k]);CL_68_OmegaMatter.append(OmegaMatter[i][j][k]/100)
+                CI_1σ.append(gamma[i][j][k]) ; CI_1σ.append(H0[i][j][k]) ; CI_1σ.append(OmegaMatter[i][j][k]/100)
+                #CI_1σ.append([Chi2[i]])
+                CI_1σ_gamma.append(gamma[i][j][k]);CI_1σ_H0.append(H0[i][j][k]);CI_1σ_OmegaMatter.append(OmegaMatter[i][j][k]/100)
         
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/4)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/4)
-print('CL_68_gamma',CL_68_gamma)
-print('CL_68_H0',CL_68_H0)
-print('CL_68_OmegaMatter',CL_68_OmegaMatter)
+merge_sort(CI_1σ_gamma);merge_sort(CI_1σ_H0);merge_sort(CI_1σ_OmegaMatter)
+
+print("CI_2σ =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/4)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/4)
+print('CI_1σ_gamma',CI_1σ_gamma)
+print('CI_1σ_H0',CI_1σ_H0)
+print('CI_1σ_OmegaMatter',CI_1σ_OmegaMatter)

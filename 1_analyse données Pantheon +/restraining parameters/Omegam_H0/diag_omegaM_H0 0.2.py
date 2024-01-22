@@ -101,7 +101,7 @@ print(Chi2)
 
 
 min = Chi2[0][1]
-CL_68 = [] ; CL_95 = [] ; CL_68_Omegam = []; CL_68_H0 = []
+CI_1σ = [] ; CI_2σ = [] ; CI_1σ_Omegam = []; CI_1σ_H0 = []
 
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
@@ -114,22 +114,22 @@ print("Om= ", arg_min_Om, "; H0= ", arg_min_H0, "; min =", min)
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
-            CL_95.append([Chi2[i][j]]);CL_95.append(OmegaM[i][j]);CL_95.append(H0[i][j])
+            CI_2σ.append([Chi2[i][j]]);CI_2σ.append(OmegaM[i][j]);CI_2σ.append(H0[i][j])
             
 
         if min <= Chi2[i][j] and Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
-            CL_68.append([Chi2[i][j]]);CL_68.append(OmegaM[i][j]);CL_68.append(H0[i][j])
-            CL_68_Omegam.append(OmegaM[i][j])
-            CL_68_H0.append(H0[i][j])
+            CI_1σ.append([Chi2[i][j]]);CI_1σ.append(OmegaM[i][j]);CI_1σ.append(H0[i][j])
+            CI_1σ_Omegam.append(OmegaM[i][j])
+            CI_1σ_H0.append(H0[i][j])
 
-merge_sort(CL_68_Omegam);merge_sort(CL_68_H0)
+merge_sort(CI_1σ_Omegam);merge_sort(CI_1σ_H0)
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
-print("CL_68_Omegam =",CL_68_Omegam)
-print("CL_68_H0=",CL_68_H0)
+print("Cl_95 =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+print("CI_1σ_Omegam =",CI_1σ_Omegam)
+print("CI_1σ_H0=",CI_1σ_H0)
 
 
 

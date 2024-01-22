@@ -88,52 +88,52 @@ gamma_range = np.arange(-30, 40, delta)
 eta_range = np.arange(-30, 40, delta)                #gamma_range.copy().T 
 gamma_range, eta_range = np.meshgrid(gamma_range, eta_range)
 gamma_range = gamma_range.astype(float);  eta_range = eta_range.astype(float)
-Z = likelihood_func(gamma_range,eta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprme un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z) ; print(gamma_range, eta_range)
+Chi2 = likelihood_func(gamma_range,eta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
+#Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
+#Chi2[0][0] = 10000
+print(Chi2) ; print(gamma_range, eta_range)
 
 
 
-min = Z[0][0]
-CL_68 = []
-CL_68_eta = []
-CL_68_gamma = []
-CL_95 = []
-for i in range(len(Z)) :
-    for j in range(len(Z[i])) :
-        if min >= Z[i][j] and Z[i][j] != 0 and Z[i][j] != nan:
-            min = Z[i][j] ; arg_min_gamma = gamma_range[i][j] ; arg_min_eta = eta_range[i][j]
+min = Chi2[0][0]
+CI_1σ = []
+CI_1σ_eta = []
+CI_1σ_gamma = []
+CI_2σ = []
+for i in range(len(Chi2)) :
+    for j in range(len(Chi2[i])) :
+        if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
+            min = Chi2[i][j] ; arg_min_gamma = gamma_range[i][j] ; arg_min_eta = eta_range[i][j]
 print("gamma= ",arg_min_gamma,"; eta= ", arg_min_eta, "; min =", min)
              #/(len(gamma_range)-1)                 #/(len(eta_range)-1)
 
 
-for i in range(len(Z)) :
-    for j in range(len(Z[i])) :
-        if  Z[i][j]<=min+6.17 and Z[i][j] != nan:
-            CL_95.append([Z[i][j]])
-            CL_95.append(gamma_range[i][j])
-            CL_95.append(eta_range[i][j])
+for i in range(len(Chi2)) :
+    for j in range(len(Chi2[i])) :
+        if  Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
+            CI_2σ.append([Chi2[i][j]])
+            CI_2σ.append(gamma_range[i][j])
+            CI_2σ.append(eta_range[i][j])
 
 
-        if Z[i][j]<=min+2.3 and Z[i][j] != nan:
-            CL_68.append([Z[i][j]])
-            CL_68.append(gamma_range[i][j])
-            CL_68.append(eta_range[i][j])
-            CL_68_eta.append(eta_range[i][j])
-            CL_68_gamma.append(gamma_range[i][j])
+        if Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
+            CI_1σ.append([Chi2[i][j]])
+            CI_1σ.append(gamma_range[i][j])
+            CI_1σ.append(eta_range[i][j])
+            CI_1σ_eta.append(eta_range[i][j])
+            CI_1σ_gamma.append(gamma_range[i][j])
 
 
-merge_sort(CL_68_gamma) ; merge_sort(CL_68_eta)
+merge_sort(CI_1σ_gamma) ; merge_sort(CI_1σ_eta)
 
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
-print("CL_68_eta =", CL_68_eta)
-print("CL_68_gamma =", CL_68_gamma)
+print("CI_2σ =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+print("CI_1σ_eta =", CI_1σ_eta)
+print("CI_1σ_gamma =", CI_1σ_gamma)
 
 
 

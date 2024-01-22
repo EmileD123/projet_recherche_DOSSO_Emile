@@ -9,8 +9,8 @@ import scipy
 import scipy.integrate as spi
 
 
-file1_path = '../../../Pantheon+SH0ES_STAT+SYS.txt'
-file2_path = '../../../Pantheon+Shoes data.txt'
+file1_path = '../Pantheon+SH0ES_STAT+SYS.txt'
+file2_path = '../Pantheon+Shoes data.txt'
 
 #on s'attaque à la matrice de covariance
 with open(file1_path) as file:
@@ -70,50 +70,50 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
     return likelihood
 
 delta = 0.001
-gamma = np.arange(4.5,5.5, delta) #gamma = np.arange(-0.1, 0.601, delta) 
+gamma = np.arange(4.7,5.001, delta) #gamma = np.arange(-0.1, 0.601, delta) 
 gamma = gamma.astype(float)
-Z = likelihood_func(gamma,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprime un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z) ; print(gamma)
+Chi2 = likelihood_func(gamma,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
+#Chi2[0][10] = 0 on supprime un outlier (valeur à 10**8)
+#Chi2[0][0] = 10000
+print(Chi2) ; print(gamma)
 
 
 
 
-min = Z[0]
-CL_68 = []
-CL_95 = []
-for i in range(len(Z)) :
-    if min >= Z[i] and Z[i]!= 0 and Z[i]!= nan:
-        min = Z[i] ; arg_min_gamma = gamma[i]
+min = Chi2[0]
+CI_1σ = []
+CI_2σ = []
+for i in range(len(Chi2)) :
+    if min >= Chi2[i] and Chi2[i]!= 0 and Chi2[i]!= nan:
+        min = Chi2[i] ; arg_min_gamma = gamma[i]
 print("gamma= ",arg_min_gamma,"; min =", min)
              #/(len(gamma)-1)                 #/(len(gamma)-1)
 
 
-for i in range(len(Z)) :
-    if Z[i]<=min+3.841 and Z[i]!= nan:
-        CL_95.append(gamma[i])
-        CL_95.append([Z[i]])
-        CL_95.append(i)
-    if Z[i]<=min+1 and Z[i]!= nan:
-        CL_68.append(gamma[i])
-        CL_68.append([Z[i]])
-        CL_68.append(i)
+for i in range(len(Chi2)) :
+    if Chi2[i]<=min+4 and Chi2[i]!= nan:
+        CI_2σ.append(gamma[i])
+        CI_2σ.append([Chi2[i]])
+        CI_2σ.append(i)
+    if Chi2[i]<=min+1 and Chi2[i]!= nan:
+        CI_1σ.append(gamma[i])
+        CI_1σ.append([Chi2[i]])
+        CI_1σ.append(i)
         
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
+print("CI_2σ =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
 """
 fig, ax = plt.subplots()
-im = ax.imshow(Z, interpolation ='bilinear',
+im = ax.imshow(Chi2, interpolation ='bilinear',
                origin ='lower',
                cmap ="bone",extent=(gamma[0],gamma[len(gamma)-1],gamma[0],gamma[len(gamma)-1])) #marche pas -> à changer !
   
 levels = [min+2.3,min+6.7]
-CS = ax.contour(Z, levels, 
+CS = ax.contour(Chi2, levels, 
                 origin ='lower',
                 cmap ='Greens',
                 linewidths = 2,extent=(gamma[0],gamma[len(gamma)-1],gamma[0],gamma[len(gamma)-1]))

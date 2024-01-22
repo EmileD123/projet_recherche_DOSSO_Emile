@@ -82,49 +82,49 @@ gamma_range = np.arange(-10, 11, delta)
 beta_range = np.arange(-10, 10, delta)                #gamma_range.copy().T 
 gamma_range, beta_range = np.meshgrid(gamma_range, beta_range)
 gamma_range = gamma_range.astype(float);  beta_range = beta_range.astype(float)
-Z = likelihood_func(gamma_range,beta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
-#Z[0][10] = 0 on supprme un outlier (valeur à 10**8)
-#Z[0][0] = 10000
-print(Z) ; print(gamma_range, beta_range)
+Chi2 = likelihood_func(gamma_range,beta_range,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
+#Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
+#Chi2[0][0] = 10000
+print(Chi2) ; print(gamma_range, beta_range)
 
 
 
-min = Z[0][0]
-CL_68 = [] ; CL_95 = []; CL_68_beta = [] ; CL_68_gamma = []
+min = Chi2[0][0]
+CI_1σ = [] ; CI_2σ = []; CI_1σ_beta = [] ; CI_1σ_gamma = []
 
 
-for i in range(len(Z)) :
-    for j in range(len(Z[i])) :
-        if min >= Z[i][j] and Z[i][j] != 0 and Z[i][j] != nan:
-            min = Z[i][j] ; arg_min_gamma = gamma_range[i][j] ; arg_min_beta = beta_range[i][j]
+for i in range(len(Chi2)) :
+    for j in range(len(Chi2[i])) :
+        if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
+            min = Chi2[i][j] ; arg_min_gamma = gamma_range[i][j] ; arg_min_beta = beta_range[i][j]
 print("gamma= ",arg_min_gamma,"; beta= ", arg_min_beta, "; min =", min)
              #/(len(gamma_range)-1)                 #/(len(beta_range)-1)
 
 
-for i in range(len(Z)) :
-    for j in range(len(Z[i])) :
-        if min <= Z[i][j] and Z[i][j]<=min+6.17 and Z[i][j] != nan:
-            CL_95.append([Z[i][j]])
-            CL_95.append(gamma_range[i][j])
-            CL_95.append(beta_range[i][j])
+for i in range(len(Chi2)) :
+    for j in range(len(Chi2[i])) :
+        if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
+            CI_2σ.append([Chi2[i][j]])
+            CI_2σ.append(gamma_range[i][j])
+            CI_2σ.append(beta_range[i][j])
 
-        if min <= Z[i][j] and Z[i][j]<=min+2.3 and Z[i][j] != nan:
-            CL_68.append([Z[i][j]])
-            CL_68.append(gamma_range[i][j])
-            CL_68.append(beta_range[i][j])
-            CL_68_gamma.append(gamma_range[i][j])
-            CL_68_beta.append(beta_range[i][j])
+        if min <= Chi2[i][j] and Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
+            CI_1σ.append([Chi2[i][j]])
+            CI_1σ.append(gamma_range[i][j])
+            CI_1σ.append(beta_range[i][j])
+            CI_1σ_gamma.append(gamma_range[i][j])
+            CI_1σ_beta.append(beta_range[i][j])
 
 
-merge_sort(CL_68_gamma) ; merge_sort(CL_68_beta)
+merge_sort(CI_1σ_gamma) ; merge_sort(CI_1σ_beta)
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
-print("CL_68_gamma =", CL_68_gamma)
-print("CL_68_beta =",CL_68_beta)
+print("Cl_95 =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+print("CI_1σ_gamma =", CI_1σ_gamma)
+print("CI_1σ_beta =",CI_1σ_beta)
 
 
 
@@ -132,12 +132,12 @@ print("CL_68_beta =",CL_68_beta)
 """
 
 fig, ax = plt.subplots()
-im = ax.imshow(Z, interpolation ='bilinear',
+im = ax.imshow(Chi2, interpolation ='bilinear',
                origin ='lower',
                cmap ="bone",extent=(-0.25,0.26,-0.25,0.26)) 
   
 levels = [min+2.3,min+6.7]
-CS = ax.contour(Z, levels, 
+CS = ax.contour(Chi2, levels, 
                 origin ='lower',
                 cmap ='Greens',
                 linewidths = 2,extent=(-0.25,0.26,-0.25,0.26))

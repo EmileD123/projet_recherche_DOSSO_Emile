@@ -100,10 +100,10 @@ print(" Chi2 = \n",Chi2) ; print("gammma range = \n",gamma_range,"beta range = \
 
 
 min = Chi2[0][0]
-CL_68 = []
-CL_68_beta = []
-CL_68_gamma = []
-CL_95 = []
+CI_1σ = []
+CI_1σ_beta = []
+CI_1σ_gamma = []
+CI_2σ = []
 petits_chi2_gamma = []
 petits_chi2_beta = []
 
@@ -118,32 +118,32 @@ print("gamma= ",arg_min_gamma,"; beta= ", arg_min_beta, "; min =", min)
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if  Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
-            CL_95.append([Chi2[i][j]])
-            CL_95.append(gamma_range[i][j])
-            CL_95.append(beta_range[i][j])
+            CI_2σ.append([Chi2[i][j]])
+            CI_2σ.append(gamma_range[i][j])
+            CI_2σ.append(beta_range[i][j])
 
 
         if Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
-            CL_68.append([Chi2[i][j]])
-            CL_68.append(gamma_range[i][j])
-            CL_68.append(beta_range[i][j])
-            CL_68_beta.append(beta_range[i][j])
-            CL_68_gamma.append(gamma_range[i][j])
+            CI_1σ.append([Chi2[i][j]])
+            CI_1σ.append(gamma_range[i][j])
+            CI_1σ.append(beta_range[i][j])
+            CI_1σ_beta.append(beta_range[i][j])
+            CI_1σ_gamma.append(gamma_range[i][j])
 
         if Chi2[i][j]<=2110 and Chi2[i][j] != nan:
             petits_chi2_beta.append(beta_range[i][j])
             petits_chi2_gamma.append(gamma_range[i][j])
 
 
-merge_sort(CL_68_gamma) ; merge_sort(CL_68_beta)
+merge_sort(CI_1σ_gamma) ; merge_sort(CI_1σ_beta)
 
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
-print("CL_68_gamma =", CL_68_gamma)
-print("CL_68_beta =", CL_68_beta)
+print("CL_95 =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+print("CI_1σ_gamma =", CI_1σ_gamma)
+print("CI_1σ_beta =", CI_1σ_beta)
 print("petits_chi2_gamma",petits_chi2_gamma)
 print("petits_chi2_beta",petits_chi2_beta)
 #print("Chi2[10][10] = ",Chi2[10][10],"gamma_range[10][10] = ",gamma_range[10][10],"beta_range[10][10] = ",beta_range[10][10])

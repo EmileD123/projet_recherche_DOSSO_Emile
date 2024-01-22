@@ -93,55 +93,55 @@ OmegaM = np.arange(0.25, 0.351, delta)
 w = np.arange(-0.95, -0.849, delta)                #OmegaM.copy().T 
 OmegaM, w = np.meshgrid(OmegaM,w,indexing='ij')
 OmegaM = OmegaM.astype(np.float64);  w = w.astype(np.float64)
-Z = likelihood_func(OmegaM,w,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
-Z = np.array(Z) ; Z = Z.astype(float)
+Chi2= likelihood_func(OmegaM,w,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2= np.array(Chi2) ; Chi2= Chi2.astype(float)
 
 
-min = Z[0][1]
-CL_68 = []
-CL_68_Omega_M = []
-CL_68_w = []
-CL_95 = []
-for i in range(len(Z)) :
-    for j in range(len(Z[i])) :
-        if min >= Z[i][j] and Z[i][j] != 0 and Z[i][j] != nan:
-            min = Z[i][j] ; arg_Om_min = OmegaM[i][j] ; arg_w_min = w[i][j]
+min = Chi2[0][1]
+CI_1σ = []
+CI_1σ_Omega_M = []
+CI_1σ_w = []
+CI_2σ = []
+for i in range(len(Chi2)) :
+    for j in range(len(Chi2[i])) :
+        if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
+            min = Chi2[i][j] ; arg_Om_min = OmegaM[i][j] ; arg_w_min = w[i][j]
 print("Om= ",arg_Om_min,"; w= ", arg_w_min, "; min =", min)
              
 
-for i in range(len(Z)) :
-    for j in range(len(Z[i])) :
-        if min <= Z[i][j] and Z[i][j]<=min+6.17 and Z[i][j] != nan:
-            CL_95.append([Z[i][j]])
-            CL_95.append(OmegaM[i][j])
-            CL_95.append(w[i][j])
-        if min <= Z[i][j] and Z[i][j]<=min+2.3 and Z[i][j] != nan:
-            CL_68.append([Z[i][j]])
-            CL_68.append(OmegaM[i][j])
-            CL_68.append(w[i][j])
-            CL_68_Omega_M.append(OmegaM[i][j]);CL_68_w.append(w[i][j])
+for i in range(len(Chi2)) :
+    for j in range(len(Chi2[i])) :
+        if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
+            CI_2σ.append([Chi2[i][j]])
+            CI_2σ.append(OmegaM[i][j])
+            CI_2σ.append(w[i][j])
+        if min <= Chi2[i][j] and Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
+            CI_1σ.append([Chi2[i][j]])
+            CI_1σ.append(OmegaM[i][j])
+            CI_1σ.append(w[i][j])
+            CI_1σ_Omega_M.append(OmegaM[i][j]);CI_1σ_w.append(w[i][j])
 
         
-merge_sort(CL_68_Omega_M);merge_sort(CL_68_w)
+merge_sort(CI_1σ_Omega_M);merge_sort(CI_1σ_w)
 
-print("Cl_95 =", CL_95)
-print("nb d'éléments CL_95 =",len(CL_95)/3)
-print("CL_68 =", CL_68)
-print("nb d'éléments CL_68 =",len(CL_68)/3)
-print("CL_68_Omega_M=", CL_68_Omega_M)
-print("CL_68_w", CL_68_w)
+print("Cl_95 =", CI_2σ)
+print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+print("CI_1σ =", CI_1σ)
+print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+print("CI_1σ_Omega_M=", CI_1σ_Omega_M)
+print("CI_1σ_w", CI_1σ_w)
 
 
 
 
 
 fig, ax = plt.subplots()
-im = ax.imshow(Z, interpolation ='bilinear',
+im = ax.imshow(Chi2, interpolation ='bilinear',
                origin ='lower',
                cmap ="bone",extent=(OmegaM[0][0],OmegaM[len(OmegaM)-1][len(OmegaM)-1],w[0][0],w[len(w)-1][len(w)-1]))
   
 levels = [min+2.3,min+6.17]
-CS = ax.contour(Z, levels, 
+CS = ax.contour(Chi2, levels, 
                 origin ='lower',
                 cmap ='Greens',
                 linewidths = 2,extent=(OmegaM[0][0],OmegaM[len(OmegaM)-1][len(OmegaM)-1],w[0][0],w[len(w)-1][len(w)-1]))
@@ -164,7 +164,7 @@ ax = fig.add_subplot(111, projection='3d')
 ax.view_init(elev=20, azim=45)  # Change elev and azim to set the view angle
 
 # Plot the 3D surface
-surface = ax.plot_surface(OmegaM, w, Z, cmap='viridis')
+surface = ax.plot_surface(OmegaM, w, Chi2, cmap='viridis')
 
 # Add color bar to show values
 fig.colorbar(surface, shrink=0.5, aspect=5)
@@ -175,7 +175,7 @@ ax.set_ylabel('w')
 ax.set_zlabel('Likelihood')
 
 
-CS1 = plt.contour(OmegaM, w, Z)
+CS1 = plt.contour(OmegaM, w, Chi2)
    
 fmt = {}
 strs = ['1', '2', '3', '4', '5', '6', '7']
