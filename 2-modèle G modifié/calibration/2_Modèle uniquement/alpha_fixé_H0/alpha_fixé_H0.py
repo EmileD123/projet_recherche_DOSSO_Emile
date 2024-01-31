@@ -7,6 +7,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
+import time
+from time import time_ns
 
 file1 = '../Pantheon+SH0ES_STAT+SYS.txt'
 file2 = '../Pantheon+Shoes data.txt'
@@ -46,6 +48,7 @@ CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOE
 
 
 
+
 #on définit la fonction qui calcule la likelihood
 def likelihood_func(H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
     likelihood=[]
@@ -77,9 +80,12 @@ def likelihood_func(H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 delta = 0.001
-H0 = np.arange(66.5, 74.5, delta) 
+H0 = np.arange(65, 75.001, delta) 
 H0 = H0.astype(float)
+tps1 = time_ns()/1e9
 Chi2 = likelihood_func(H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+tps2 = time_ns()/1e9
+print("temps de calcul de Chi2 = ", tps2 - tps1, " s")
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
 
 

@@ -59,7 +59,8 @@ def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(((1+0.18*(x/(1+x)))**(1/2))*H0[k][k]*((((OmegaMatter[j][j])/100)*((1+x)**3)+(1-((OmegaMatter[j][j])/100)))**(1/2))))*(3*(10**5))*(10**6) #🔴Omegam divisé par 100 ici ! ; calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
+                    return (1/(((1+0.192*(x/(1+x)))**(1/2))*H0[k][k]*((((OmegaMatter[j][j])/100)*((1+x)**3)+(1-((OmegaMatter[j][j])/100)))**(1/2))))*(3*(10**5))*(10**6) # alpha = ((H0riess/H0planck)^2)-1 ≈ 0.18 ; alpha_brout_f_lcdm = ((H0brout_f_lcdm /H0planck)^2)-1 ≈ 0.192 
+                #🔴Omegam divisé par 100 ici ! ; calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
                 result = spi.quad(f,0,zHD[i])                                               #idem
                 mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 
