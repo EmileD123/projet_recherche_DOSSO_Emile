@@ -72,7 +72,7 @@ def likelihood_func(H0) :
 
 
 if __name__ == '__main__':
-    with Pool(16) as p:
+    with Pool(32) as p:
         H0 = np.arange(65,75.1,0.001)
         H0 = H0.astype(float) ; H0 = np.array(H0)
         tps1 = time_ns()/1e9

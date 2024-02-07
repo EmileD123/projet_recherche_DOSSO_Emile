@@ -1,4 +1,4 @@
-CAS alpha = 0.18 ( alpha = ((H0riess/H0planck)^2)-1 )
+🔴CAS alpha = 0.18 ( alpha = ((H0riess/H0planck)^2)-1 )
 
 
 *delta = 0.01 ; H0 E [65;75] :
@@ -26,7 +26,7 @@ CI_1σ = [67.7990000000062, [1528.9291871048927], 67.80000000000621, [1528.91193
 nb d'éléments CI_1σ = 229.0
 
 
-CAS alpha_brout_f_lcdm = 0.192 ( alpha_brout_f_lcdm = ((H0brout_f_lcdm /H0planck)^2)-1 ) :
+🔴CAS alpha_brout_f_lcdm = 0.192 ( alpha_brout_f_lcdm = ((H0brout_f_lcdm /H0planck)^2)-1 ) :
 
 *delta = 0.001 ; H0 E [66.5;74.5] :
 

@@ -8,6 +8,7 @@ import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
 from merge_sort import merge_sort as merge_sort
+from time import time
 
 #on s'attaque à la matrice de covariance
 with open('Pantheon+SH0ES_STAT+SYS.txt') as file:
@@ -89,11 +90,14 @@ def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 #maintenant on va tenter de tracer le diagramme (Omegam,Omegalambda) en faisant varier ces paramètres et trouver le minimum de la likelihood
 delta = 0.1
-OmegaM = np.arange(25, 35.1, delta) 
-H0 = np.arange(65, 75.1, delta)                #OmegaM.copy().T 
-OmegaM, H0 = np.meshgrid(OmegaM, H0)
+OmegaM = np.arange(30, 35.1, delta) ; OmegaM = OmegaM[:-2]
+H0 = np.arange(70, 75.1, delta)  ; H0 = H0[:-1] 
+OmegaM, H0 = np.meshgrid(OmegaM, H0,indexing='ij')
 OmegaM = OmegaM.astype(float);  H0 = H0.astype(float)
-Chi2 = likelihood_func(OmegaM,H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+tps1 = time()
+Chi2 = likelihood_func(OmegaM,H0,matcov_SN_Cepheid_diag,zHD,CEPH_DIST,MU_SHOES)
+tps2 = time()
+print("time of computation of Chi2 = ", tps2 - tps1)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
 #Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
 print(Chi2)
@@ -106,7 +110,7 @@ CI_1σ = [] ; CI_2σ = [] ; CI_1σ_Omegam = []; CI_1σ_H0 = []
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
-            min = Chi2[i][j] ; arg_min_Om = OmegaM[0][i] ; arg_min_H0 =H0[j][0]
+            min = Chi2[i][j] ; arg_min_Om = OmegaM[i][j] ; arg_min_H0 = H0[i][j]
 print("Om= ", arg_min_Om, "; H0= ", arg_min_H0, "; min =", min)
              #/(len(OmegaM)-1)                 #/(len(OmegaL)-1)
 

@@ -8,7 +8,7 @@ import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
 from merge_sort import merge_sort as merge_sort
-
+from time import time
 
 file1 = '..\Pantheon+SH0ES_STAT+SYS.txt'
 file2 = '..\Pantheon+Shoes data.txt'
@@ -46,22 +46,22 @@ CEPH_DIST = np.array(CEPH_DIST); zHD = np.array(zHD); MU_SHOES = np.array(MU_SHO
 CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOES.astype(float)
 
 
-
+                                                                   
 
 #on définit la fonction qui calcule la likelihood
 def likelihood_func(gamma,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
     likelihood=[]
-    for i in range(len(gamma)):
+    for m in range(len(gamma)):
         likelihood.append([])
     for j in range(len(gamma)):
-        for k in range(len(H0)):
+        for k in range(len(H0)):                
             DeltaD = np.empty(1701)                            
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(((1+0.192*(x/(1+x)))**(1/2))*H0[k][k]*(((0.334)*((1+x)**3)+(0.666))**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
-                result = spi.quad(f,0,zHD[i])                                               #idem
-                mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
+                    return (1/(((1+0.192*(1/(1+x)))**(1/2))*H0[k][k]*(((0.334)*((1+x)**3)+(0.666))**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
+                result = spi.quad(f,0,zHD[i])
+                mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                    
 
                 if CEPH_DIST[i] == -9.0 : #on vérifie si la mesure est relié à la mesure d'une distance avec une Cepheid (CEPH_DIST[i] == -9.0 signifie que ce n'est pas le cas)
                     mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+0.192*(1/(1+zHD[i])))/(1+0.192)))-mu_theory #alpha = 0.18 ; alpha_brout = 0.192
@@ -80,14 +80,19 @@ def likelihood_func(gamma,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 
-delta = 0.1
-gamma = np.arange(-5, 0, delta)
-H0 = np.arange(65, 70, delta) #; H0 = H0[:-1]               
-gamma, H0 = np.meshgrid(gamma, H0,indexing='ij')
+delta = 0.01
+gamma = np.arange(-5,5,delta)
+H0 = np.arange(65, 75, delta) #; H0 = H0[:-1]               
+gamma , H0 = np.meshgrid(gamma, H0,indexing='ij')
 gamma = gamma.astype(float);  H0 = H0.astype(float)
+print(gamma);print(H0)
+tps1 = time()
 Chi2 = likelihood_func(gamma,H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+tps2 = time()
+print("temps de calcul Chi2 = ", tps2-tps1)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)  
 print(Chi2)
+
 
 
 
@@ -98,18 +103,18 @@ for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min >= Chi2[i][j] and Chi2[i][j] != 0 and Chi2[i][j] != nan:
             min = Chi2[i][j] ; arg_min_gamma = gamma[i][j] ; arg_min_H0 =H0[i][j]
-print("gamma= ", arg_min_gamma/100, "; H0= ", arg_min_H0, "; min =", min)
+print("gamma= ", arg_min_gamma, "; H0= ", arg_min_H0, "; min =", min)
 
 
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
         if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
-            CI_2σ.append([Chi2[i][j]]);CI_2σ.append(gamma[i][j]/100);CI_2σ.append(H0[i][j])
+            CI_2σ.append([Chi2[i][j]]);CI_2σ.append(gamma[i][j]);CI_2σ.append(H0[i][j])
             
 
         if min <= Chi2[i][j] and Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
-            CI_1σ.append([Chi2[i][j]]);CI_1σ.append(gamma[i][j]/100);CI_1σ.append(H0[i][j])
-            CI_1σ_gamma.append(gamma[i][j]/100)
+            CI_1σ.append([Chi2[i][j]]);CI_1σ.append(gamma[i][j]);CI_1σ.append(H0[i][j])
+            CI_1σ_gamma.append(gamma[i][j])
             CI_1σ_H0.append(H0[i][j])
 
 merge_sort(CI_1σ_gamma);merge_sort(CI_1σ_H0)

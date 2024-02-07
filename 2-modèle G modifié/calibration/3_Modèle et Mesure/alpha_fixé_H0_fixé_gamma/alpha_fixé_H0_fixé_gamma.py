@@ -55,7 +55,7 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
         for i in range(1701):
             mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
             def f(x):
-                return (1/(((1+0.192*(1/(1+x)))**(1/2))*67.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) 
+                return (1/(((1+0.192*(1/(1+x)))**(1/2))*67.4*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) 
                                                        #67.59999999999985
             result = spi.quad(f,0,zHD[i])                                               
             mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
@@ -107,7 +107,7 @@ for i in range(len(Chi2)) :
         
 
 
-print("CL_95 =", CI_2σ)
+print("CI_2σ =", CI_2σ)
 print("nb d'éléments CI_2σ =",len(CI_2σ)/2)
 print("CI_1σ =", CI_1σ)
 print("nb d'éléments CI_1σ =",len(CI_1σ)/2)

@@ -7,6 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as ticker
 import scipy
 import scipy.integrate as spi
+from time import time
 
 file1 = '..\Pantheon+SH0ES_STAT+SYS.txt'
 file2 = '..\Pantheon+Shoes data.txt'
@@ -87,10 +88,13 @@ def likelihood_func(H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 #maintenant on va tenter de tracer le diagramme (H0,Omegalambda) en faisant varier ces paramètres et trouver le minimum de la likelihood
-delta = 0.01
-H0 = np.arange(70,75.01, delta) 
+delta = 0.1
+H0 = np.arange(70,75.1, delta) 
 H0 = H0.astype(float);  
-Chi2 = likelihood_func(H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+tps1 = time()
+Chi2 = likelihood_func(H0,matcov_SN_Cepheid_diag,zHD,CEPH_DIST,MU_SHOES)
+tps2 = time()
+print("temps de calcul Chi2 = ", tps2-tps1)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
 #Chi2[0][10] = 0 on supprme un outlier (valeur à 10**8)
 
@@ -118,7 +122,7 @@ for i in range(len(Chi2)) :
 
 
 
-print("Cl_95 =", CI_2σ)
+print("CI_2σ =", CI_2σ)
 print("nb d'éléments CI_2σ =",len(CI_2σ)/2)
 print("CI_1σ =", CI_1σ)
 print("nb d'éléments CI_1σ =",len(CI_1σ)/2)
