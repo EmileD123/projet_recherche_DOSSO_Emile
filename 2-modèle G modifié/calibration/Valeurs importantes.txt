@@ -2,7 +2,7 @@ H0riess = 73.30 ± 1.04 km s−1 Mpc−1
 
 H0planck = 67.4±0.5 km s−1Mpc−1
 
-alpha = ((H0riess/H0planck)^2)-1 ≈ 0.18 (-> incertitudes à déterminer)
+alpha = ((H0riess/H0planck)^2)-1 ≈ 0.18 (-> incertitudes à déterminer ; aussi appelé alpha_riess dans certains programmes)
 -> plus précisément 0.183 (faire encore plus précis n'est pas pertinent car pas assez de chiffres significatifs)
 
 

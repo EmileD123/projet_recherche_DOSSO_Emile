@@ -12,7 +12,7 @@ file = "..\Pantheon+Shoes data.txt"
 # Initialize two empty lists to store the values from the columns
 zHD = []
 MU_SHOES = []
-
+CEPH_DIST = []
 # Open the text file for reading
 with open(file) as file:
     # Loop through each line in the file
@@ -25,11 +25,13 @@ with open(file) as file:
             # Append the values from the first and second columns to their respective lists
             zHD.append(columns[2])
             MU_SHOES.append(columns[10])
+            CEPH_DIST.append(columns[12])
 
 
 
-zHD.pop(0) ;MU_SHOES.pop(0);zHD = np.array(zHD);MU_SHOES = np.array(MU_SHOES) #passer de list à array permet de faire plus de manipulations par la suite
-zHD = zHD.astype(float);MU_SHOES = MU_SHOES.astype(float)
+CEPH_DIST.pop(0); zHD.pop(0); MU_SHOES.pop(0)
+CEPH_DIST = np.array(CEPH_DIST); zHD = np.array(zHD); MU_SHOES = np.array(MU_SHOES) #passer de liste à array facilite les manipulations par la suite
+CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOES.astype(float)
 plt.figure(1)
 
 Dl_SHOES = [] #distances lumineuses déterminées à partir de MU_SHOES (en parsecs)
@@ -47,7 +49,6 @@ plt.xlabel('redshift')
 plt.xscale('log')
 plt.title('Hubble diagram of SNe IA')
 
-#residuals = []
 
 #on approxime la courbe expérimentale (intérêt?)
 """
@@ -65,25 +66,29 @@ residuals = []
 
 for z in zHD:
     def f(x):
-        return (1/(73.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6)
+        return (1/(73.6*((0.334*((1+x)**3)+0.664)**(1/2))))*(3*(10**5))*(10**6) 
     result = spi.quad(f,0,z)
     result_final = 5*np.log10(((1+z)*result[0])/10)
     MU_theory.append(result_final)
     Dl_theory.append(10**((result_final/5)+1))
 
 for i in range(1701):
-    residuals.append(MU_SHOES[i]-MU_theory[i])
+    if CEPH_DIST == -9.0 :
+        residuals.append(MU_SHOES[i]-MU_theory[i])
+    else : 
+        residuals.append(MU_SHOES[i]-CEPH_DIST[i])
+
 
 plt.figure(1)
-plt.plot(zHD,MU_theory,c='orange',label='Flat LCDM')
+plt.plot(zHD,MU_theory,c='orange',label='Flat wCDM')
 #plt.plot(zHD,Dl_theory,c='red',label='luminous distance Flat LCDM')
-plt.title('Hubble Diagram flat LCDM')
+plt.title('Hubble Diagram flat wCDM')
 plt.xscale('log')
 plt.legend()
 
 plt.figure(2)
 plt.scatter(zHD,residuals,c='g')
-plt.title('residuals flat LCDM')
+plt.title('residuals flat wCDM')
 plt.xscale('log')
 plt.legend()
 

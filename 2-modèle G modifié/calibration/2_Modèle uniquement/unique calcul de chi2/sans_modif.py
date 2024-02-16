@@ -54,7 +54,7 @@ def likelihood_func(mat_cov,zHD,CEPH_DIST,MU_SHOES) :
     for i in range(1701):
         mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
         def f(x):
-            return (1/((73.6)*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques FlatLambdaCDM dans Brout et al. 2022 = Analysis on cosmological constraints
+            return (1/((73.3)*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques FlatLambdaCDM dans Brout et al. 2022 = Analysis on cosmological constraints
         result = spi.quad(f,0,zHD[i])                                               
         mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 

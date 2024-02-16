@@ -26,22 +26,6 @@ CEPH_DIST.pop(0); zHD.pop(0); MU_SHOES.pop(0)
 CEPH_DIST = np.array(CEPH_DIST); zHD = np.array(zHD); MU_SHOES = np.array(MU_SHOES)
 CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOES.astype(float)
 
-
-plt.figure(1)
-#C'est bon on a nos deux listes : il ne reste plus qu'à tracer le nuages de points
-plt.scatter(zHD,MU_SHOES , c='blue', marker='.', label='Original Data')
-"""
-y = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES)
-#print(y)
-plt.plot(zHD,39.29971437+2.31618666*np.log(zHD*6.60324733), c = 'black',label='Fitted Curve Original Data')
-"""
-
-plt.ylabel('modulus distance')
-plt.xlabel('redshift')
-plt.xscale('log')
-plt.title('Hubble diagram of SNe IA')
-
-
 MU_SHOES_only_alpha = [] ; MU_SHOES_only_alpha_form_exp = [] ; MU_SHOES_alpha_fixé_et_gamma_à_optimiser = [] 
 MU_SHOES_alpha_fixé_et_gamma_à_optim_forme_exp = [] ; MU_SHOES_alpha_fixé_et_beta_à_optimiser = [] ; MU_SHOES_alpha_fixe_et_beta_gamma_à_optim = [] 
 
@@ -51,11 +35,9 @@ for z in zHD:
         return (1/(73.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6)
     result = spi.quad(f,0,z)
     result_final = 5*np.log10(((1+z)*result[0])/10)
-    #residuals = ? <- difficulté : associer à chaque entité de MU_SHOES un redshift : pas si simple parce qu'il y a plus de light curves (1701) que de SNE1A (1500 et des bananes) donc à priori certaines instances de MU_SHOES ont des z identiques ...   
     MU_theory_flatLCDM.append(result_final)
-
-plt.plot(zHD,MU_theory_flatLCDM,c='red',label='Theory flat LCDM')
-
+ 
+gamma = 2.58
 for i in range(1701):
         """
         #only_alpha : alpha = 0.04 (+0.02 -0.01)
@@ -66,7 +48,7 @@ for i in range(1701):
         MU_SHOES_only_alpha_form_exp.append(mu__only_alpha_form_exp)
         """
         #alpha_fixé_et_gamma_à_optimiser : gamma = 0.258 (+0.12 -0.12)
-        mu_alpha_fixé_et_gamma_à_optimiser = MU_SHOES[i] + (5/2)*(0.258)*np.log10((1+(0.18*(1/(1+zHD[i]))))/(1+0.18))
+        mu_alpha_fixé_et_gamma_à_optimiser = MU_SHOES[i] + (5/2)*(gamma)*np.log10((1+0.18*(1/(1+zHD[i])))/(1+0.18))
         MU_SHOES_alpha_fixé_et_gamma_à_optimiser.append(mu_alpha_fixé_et_gamma_à_optimiser)
         """
         #alpha_fixé_et_gamma_à_optim_forme_exp : gamma = -0.23 (+0.108 -0.109)
@@ -80,7 +62,6 @@ for i in range(1701):
         MU_SHOES_alpha_fixe_et_beta_gamma_à_optim.append(mu_alpha_fixe_et_beta_gamma_à_optim)
         """
 
-
 """
 #only_alpha : 38.5979981 2.31255411 8.91327677
 plt.scatter(zHD,MU_SHOES_only_alpha , c='g', marker='.', label='only alpha')
@@ -93,10 +74,8 @@ plt.scatter(zHD,MU_SHOES_only_alpha_form_exp , c='r', marker='.', label='only al
 y_only_alpha_exp = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES_only_alpha_form_exp)
 #print(y_only_alpha_exp)
 plt.plot(zHD,y_only_alpha_exp[0][0]+y_only_alpha_exp[0][1]*np.log(zHD*y_only_alpha_exp[0][2]), c ='r' ,label='Fitted Curve only alpha exp')
-"""
+
 #alpha_fixé_et_gamma_à_optimiser : 36.41466768 2.31238919 22.91085229
-plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optimiser , c='green', marker='.', label='alpha_fixé_et_gamma_à_optimiser ')
-"""
 y_alpha_fixé_et_gamma_à_optimiser = scipy.optimize.curve_fit(lambda t,a,b,c: a+b*np.log(c*t),  zHD,  MU_SHOES_alpha_fixé_et_gamma_à_optimiser)
 #print(y_alpha_fixé_et_gamma_à_optimiser)
 plt.plot(zHD,y_alpha_fixé_et_gamma_à_optimiser[0][0]+y_alpha_fixé_et_gamma_à_optimiser[0][1]*np.log(zHD*y_alpha_fixé_et_gamma_à_optimiser[0][2]), c ='red' ,label='Fitted Curve alpha_fixé_et_gamma_à_optimiser')
@@ -125,18 +104,32 @@ print("on calcule la différence pour z = ",zHD[1700])
 shift = MU_SHOES[1700]-MU_SHOES_alpha_fixé_et_gamma_à_optimiser[1700]
 print("différence obtenue avec l'algo = ",shift)
 """
+
+plt.figure(1)
+plt.scatter(zHD,MU_SHOES , c='green', marker='.', label='Original Data')
+plt.scatter(zHD,MU_SHOES_alpha_fixé_et_gamma_à_optimiser , c='red', marker='.', label=('Data alpha_fixé_et_gamma_à_optimiser gamma = 0.258+0.12'))
+plt.plot(zHD,MU_theory_flatLCDM,c='green',label='Theory flat LCDM')
+plt.ylabel('modulus distance')
+plt.xlabel('redshift')
+plt.xscale('log')
+plt.title('Hubble diagram of SNe IA')
 plt.legend()
 
-plt.figure(2)
+
 residuals_sans_modif = []
 residuals_avec_modif = []
 
 for i in range(1701):
-     residuals_sans_modif.append(MU_SHOES[i]-MU_theory_flatLCDM[i])
-     residuals_avec_modif.append(MU_SHOES_alpha_fixé_et_gamma_à_optimiser[i]-MU_theory_flatLCDM[i])
-
+    if CEPH_DIST[i] == -9.0 :
+        residuals_sans_modif.append(MU_SHOES[i]-MU_theory_flatLCDM[i])
+        residuals_avec_modif.append(MU_SHOES_alpha_fixé_et_gamma_à_optimiser[i]-MU_theory_flatLCDM[i])
+    else :
+        residuals_sans_modif.append(MU_SHOES[i]-CEPH_DIST[i])
+        residuals_avec_modif.append(MU_SHOES_alpha_fixé_et_gamma_à_optimiser[i]-CEPH_DIST[i])
+     
+plt.figure(2)
 plt.scatter(zHD,residuals_sans_modif,c='green',label="luminosity non-modified")
-plt.scatter(zHD,residuals_avec_modif,c='red',label='luminosity modified')
+plt.scatter(zHD,residuals_avec_modif,c='red',label=('luminosity modified (gamma = 0.258+0.12)'))
 plt.xscale('log')
 plt.legend()
 

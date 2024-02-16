@@ -49,7 +49,7 @@ CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOE
                                                                    
 
 #on définit la fonction qui calcule la likelihood
-def likelihood_func(gamma,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
+def likelihood_func(alpha,gamma,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
     likelihood=[]
     for m in range(len(gamma)):
         likelihood.append([])
@@ -59,15 +59,15 @@ def likelihood_func(gamma,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(((1+0.192*(1/(1+x)))**(1/2))*H0[k][k]*(((0.334)*((1+x)**3)+(0.666))**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
+                    return (1/(((1+alpha*(1/(1+x)))**(1/2))*H0[k][k]*(((0.334)*((1+x)**3)+(0.666))**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaMatter provenant du flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
                 result = spi.quad(f,0,zHD[i])
                 mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                    
 
                 if CEPH_DIST[i] == -9.0 : #on vérifie si la mesure est relié à la mesure d'une distance avec une Cepheid (CEPH_DIST[i] == -9.0 signifie que ce n'est pas le cas)
-                    mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+0.192*(1/(1+zHD[i])))/(1+0.192)))-mu_theory #alpha = 0.18 ; alpha_brout = 0.192
-                    DeltaD[i]=mu
+                    mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+alpha*(1/(1+zHD[i])))/(1+alpha)))-mu_theory #alpha = 0.18 ; alpha_brout = 0.192
+                    DeltaD[i]=mu 
                 else :
-                    mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+0.192*(1/(1+zHD[i])))/(1+0.192)))-mu_cepheid #alpha = 0.18 ; alpha_brout = 0.192
+                    mu = (mu_shoes + (5/2)*gamma[j][j]*np.log10((1+alpha*(1/(1+zHD[i])))/(1+alpha)))-mu_cepheid #alpha = 0.18 ; alpha_brout = 0.192
                     DeltaD[i]=mu
             DeltaD_transpose = np.transpose(DeltaD)
                 #on calcule la likelihood 
@@ -79,15 +79,16 @@ def likelihood_func(gamma,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 
-
+#Set-up entries of likelihood_func
+alpha_riess = 0.18 ; alpha_brout_f_lcdm = 0.192
 delta = 0.01
-gamma = np.arange(-5,5,delta)
-H0 = np.arange(65, 75, delta) #; H0 = H0[:-1]               
+gamma = np.arange(-0.99,-0.11,delta)
+H0 = np.arange(67.10, 67.99, delta) #; H0 = H0[:-1]               
 gamma , H0 = np.meshgrid(gamma, H0,indexing='ij')
 gamma = gamma.astype(float);  H0 = H0.astype(float)
 print(gamma);print(H0)
 tps1 = time()
-Chi2 = likelihood_func(gamma,H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = likelihood_func(alpha_riess ,gamma,H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 tps2 = time()
 print("temps de calcul Chi2 = ", tps2-tps1)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)  
@@ -108,22 +109,22 @@ print("gamma= ", arg_min_gamma, "; H0= ", arg_min_H0, "; min =", min)
 
 for i in range(len(Chi2)) :
     for j in range(len(Chi2[i])) :
-        if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
-            CI_2σ.append([Chi2[i][j]]);CI_2σ.append(gamma[i][j]);CI_2σ.append(H0[i][j])
+        #if min <= Chi2[i][j] and Chi2[i][j]<=min+6.17 and Chi2[i][j] != nan:
+        #    CI_2σ.append([Chi2[i][j]]);CI_2σ.append(gamma[i][j]);CI_2σ.append(H0[i][j])
             
 
         if min <= Chi2[i][j] and Chi2[i][j]<=min+2.3 and Chi2[i][j] != nan:
-            CI_1σ.append([Chi2[i][j]]);CI_1σ.append(gamma[i][j]);CI_1σ.append(H0[i][j])
+           # CI_1σ.append([Chi2[i][j]]);CI_1σ.append(gamma[i][j]);CI_1σ.append(H0[i][j])
             CI_1σ_gamma.append(gamma[i][j])
             CI_1σ_H0.append(H0[i][j])
 
 merge_sort(CI_1σ_gamma);merge_sort(CI_1σ_H0)
 
-print("CI_2σ =", CI_2σ)
-print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
-print("CI_1σ =", CI_1σ)
-print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
-print("CI_1σ_gamma =",CI_1σ_gamma)
-print("CI_1σ_H0=",CI_1σ_H0)
+#print("CI_2σ =", CI_2σ)
+#print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+#print("CI_1σ =", CI_1σ)
+#print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+print("gamma-1σ =",CI_1σ_gamma[0]) ; print("; gamma+1σ =",CI_1σ_gamma[-1])#print("CI_1σ_gamma =",CI_1σ_gamma)
+print("H0-1σ =",CI_1σ_H0[0]) ; print("; H0+1σ =",CI_1σ_H0[-1])#print("CI_1σ_H0=",CI_1σ_H0)
 
  

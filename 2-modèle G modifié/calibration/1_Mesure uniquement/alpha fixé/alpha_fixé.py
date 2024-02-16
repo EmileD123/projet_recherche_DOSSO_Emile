@@ -52,8 +52,8 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
         for i in range(1701):
             mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
             def f(x):
-                return (1/(73.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) #🔴calcul de la distance lumineuse avec les paramètres cosmologiques (H0=73.5 pour le flat wCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
-            result = spi.quad(f,0,zHD[i])                                               #idem
+                return (1/(73.6*((0.334*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6)
+            result = spi.quad(f,0,zHD[i])                                              
             mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 
             if CEPH_DIST[i] == -9.0 : #on vérifie si la mesure est relié à la mesure d'une distance avec une Cepheid (CEPH_DIST[i] == -9.0 signifie que ce n'est pas le cas)
@@ -75,8 +75,8 @@ def likelihood_func(gamma,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 
 
-delta = 0.001
-gamma = np.arange(-0.1, 0.601, delta) 
+delta = 0.01
+gamma = np.arange(-0.5, 0.6, delta) 
 gamma = gamma.astype(float)
 Chi2 = likelihood_func(gamma,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
