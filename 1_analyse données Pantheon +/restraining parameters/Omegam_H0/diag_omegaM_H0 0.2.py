@@ -47,7 +47,7 @@ CEPH_DIST = CEPH_DIST.astype(float); zHD = zHD.astype(float); MU_SHOES = MU_SHOE
 
 #on définit la fonction qui calcule la likelihood
 def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
-    likelihood=[]
+    likelihood=[] 
     for i in range(len(OmegaMatter)):
         likelihood.append([])
     for j in range(len(OmegaMatter)):
@@ -56,7 +56,7 @@ def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
             for i in range(1701):
                 mu_shoes = MU_SHOES[i] ; mu_cepheid = CEPH_DIST[i]
                 def f(x):
-                    return (1/(H0[k][k]*(((OmegaMatter[j][j]/100)*((1+x)**3)+0.666)**(1/2))))*(3*(10**5))*(10**6) #🔴Omegam divisé par 100 ici ! ; calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
+                    return (1/(H0[k][k]*(((OmegaMatter[j][j]/100)*((1+x)**3)+(1-(OmegaMatter[j][j]/100)))**(1/2))))*(3*(10**5))*(10**6) #🔴Omegam divisé par 100 ici ! ; calcul de la distance lumineuse avec les paramètres cosmologiques (OmegaLambda correspondant au flat ΛCDM dans Brout et al. 2022 = Analysis on cosmological constraints)
                 result = spi.quad(f,0,zHD[i])                                               #idem
                 mu_theory = 5*np.log10(((1+zHD[i])*result[0])/10)                              
 
@@ -90,12 +90,12 @@ def likelihood_func(OmegaMatter,H0,mat_cov,zHD,CEPH_DIST,MU_SHOES) :
 
 #maintenant on va tenter de tracer le diagramme (Omegam,Omegalambda) en faisant varier ces paramètres et trouver le minimum de la likelihood
 delta = 0.1
-OmegaM = np.arange(30, 35.1, delta) ; OmegaM = OmegaM[:-2]
-H0 = np.arange(70, 75.1, delta)  ; H0 = H0[:-1] 
+OmegaM = np.arange(25, 38.1, delta) #; OmegaM = OmegaM[:-1]
+H0 = np.arange(67, 80.1, delta)
 OmegaM, H0 = np.meshgrid(OmegaM, H0,indexing='ij')
 OmegaM = OmegaM.astype(float);  H0 = H0.astype(float)
 tps1 = time()
-Chi2 = likelihood_func(OmegaM,H0,matcov_SN_Cepheid_diag,zHD,CEPH_DIST,MU_SHOES)
+Chi2 = likelihood_func(OmegaM,H0,matcov_SN_Cepheid,zHD,CEPH_DIST,MU_SHOES)
 tps2 = time()
 print("time of computation of Chi2 = ", tps2 - tps1)
 Chi2 = np.array(Chi2) ; Chi2 = Chi2.astype(float)
@@ -128,26 +128,27 @@ for i in range(len(Chi2)) :
 
 merge_sort(CI_1σ_Omegam);merge_sort(CI_1σ_H0)
 
-print("Cl_95 =", CI_2σ)
-print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
-print("CI_1σ =", CI_1σ)
-print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
-print("CI_1σ_Omegam =",CI_1σ_Omegam)
-print("CI_1σ_H0=",CI_1σ_H0)
+#print("Cl_95 =", CI_2σ)
+#print("nb d'éléments CI_2σ =",len(CI_2σ)/3)
+#print("CI_1σ =", CI_1σ)
+#print("nb d'éléments CI_1σ =",len(CI_1σ)/3)
+#print("CI_1σ_Omegam =",CI_1σ_Omegam)
+#print("CI_1σ_H0=",CI_1σ_H0)
 
 
-
+print("OmegaM-1σ =",CI_1σ_Omegam[0],"; OmegaM+1σ =",CI_1σ_Omegam[-1]) #print("CI_1σ_gamma =",CI_1σ_gamma)
+print("H0-1σ =",CI_1σ_H0[0],"; H0+1σ =",CI_1σ_H0[-1])#print("CI_1σ_H0=",CI_1σ_H0)
 
 fig, ax = plt.subplots()
 im = ax.imshow(Chi2, interpolation ='bilinear',
                origin ='lower',
-               cmap ="bone",extent=(65,75,25,35))
+               cmap ="bone",extent=(65,80,25,40))
   
 levels = [min+2.3,min+6.7]
 CS = ax.contour(Chi2, levels, 
                 origin ='lower',
                 cmap ='Greens',
-                linewidths = 2,extent=(65,75,25,35))
+                linewidths = 2,extent=(65,80,25,40))
 
 ax.set_xlabel('H0', fontsize=12)  
 ax.set_ylabel('OmegaM', fontsize=12)   

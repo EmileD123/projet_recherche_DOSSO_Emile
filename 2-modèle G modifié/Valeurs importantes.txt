@@ -1,0 +1,18 @@
+H0riess = 73.30 ± 1.04 km s−1 Mpc−1
+
+H0planck = 67.4±0.5 km s−1Mpc−1
+
+H0brout_f_lcdm = 73.6 ± 1.1 km s−1Mpc−1
+
+*G/Gn = 1 + alpha*a
+
+alpha = ((H0riess/H0planck)^2)-1 ≈ 0.18 (-> incertitudes à déterminer ; aussi appelé alpha_riess dans certains programmes)
+-> plus précisément 0.183 (faire encore plus précis n'est pas pertinent car pas assez de chiffres significatifs)
+
+alpha_brout_f_lcdm ≈ 0.192
+
+
+
+*G/Gn = (1 + alpha_2 * a)^2
+
+alpha_2 = 0.088 

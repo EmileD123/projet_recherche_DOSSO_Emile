@@ -1,0 +1,22 @@
+*delta = 2 → gamma*m E [-10;10]*[-10;10]; delta = 1 → H0 E [65;75] 
+
+gamma=  -4.0 ; H0=  71.0 ; m=  0.0 ; min = 1529.9851920483063 ← IDEE : resserer autour de 0 pour m : permettrait d'avoir des m =/= 0 pour le min de chi2
+gamma - 1σ =  -4.0 ; gamma + 1σ =  -4.0
+m - 1σ =  0.0 ; m + 1σ =  0.0  ← ATTENTION : il y avait une erreur dans le calcul des bornes
+H0 - 1σ =  65.0 ; H0 + 1σ =  75.0
+
+
+
+*delta = 2 → gamma E [-10;10]; delta = 1 → H0 E [65;75] ; delta = 0.5 → m E [-2.5;2.5]
+
+gamma=  -4.0 ; H0=  75.0 ; m=  0.0 ; min = 1529.985006469342
+gamma - 1σ =  -4.0 ; gamma + 1σ =  -4.0
+m - 1σ =  0.0 ; m + 1σ =  0.0 ← ATTENTION : il y avait une erreur dans le calcul des bornes
+H0 - 1σ =  65.0 ; H0 + 1σ =  75.0
+
+*delta = 2 → gamma E [-10;10]; delta = 1 → H0 E [65;75] ; delta = 0.5 → m E [1;11]
+
+gamma=  -4.0 ; H0=  66.0 ; m=  6.0 ; min = 1529.9851920483063 ← POURQUOI quasiment toujours le même min Chi2?
+gamma - 1σ =  -4.0 ; gamma + 1σ =  -4.0
+m - 1σ =  6.0 ; m + 1σ =  6.0
+H0 - 1σ =  65.0 ; H0 + 1σ =  75.0

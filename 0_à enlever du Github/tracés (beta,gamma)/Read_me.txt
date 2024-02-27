@@ -1,0 +1,1 @@
+-tracé des contours des paramètres beta et gamma (1 et 2 sigma) : paramètres correspondant à d'anciens modèles d'évolution de G incorrectes

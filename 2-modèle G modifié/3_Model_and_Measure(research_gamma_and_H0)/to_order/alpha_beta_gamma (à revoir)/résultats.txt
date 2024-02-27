@@ -1,0 +1,3 @@
+0.01 sur [-0.25;0.25]_[-0.25;0.25] :
+
+alpha=  -0.039999999999999813 ; beta=  -0.009999999999999787 ; min = 1522.62665230664 -> peu fiable : voir le tracé (étrange) des intervalles de confiance
