@@ -1,1 +1,0 @@
-*maillage 200_200 sur [0.25;0.45]_ [0.55;0.75] : semble décalé par rapport aux résultats de Brout et al.2022 (Figure 8)
